@@ -1,3 +1,5 @@
+# scType test
+```
 use this code:
 
 library(knitr)
@@ -70,4 +72,4 @@ for(j in unique(sctype_scores$cluster)){
 }
 
 DimPlot(pbmc, reduction = "umap", label = TRUE, repel = TRUE, group.by = 'customclassif')  
-
+```
