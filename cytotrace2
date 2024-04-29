@@ -13,3 +13,12 @@ cytotrace2_result <- cytotrace2(expression_data)
 # extract annotation data
 annotation_cluster <- CART_T[["seurat_clusters"]]
 annotation <- CART_T[["orig.ident"]]
+# generate prediction and phenotype association plots with plotData function
+plots <- plotData(cytotrace2_result = cytotrace2_result, 
+                  annotation = annotation,
+                  expression_data = expression_data
+                  )
+plots__cluster <- plotData(cytotrace2_result = cytotrace2_result, 
+                  annotation = annotation_cluster,
+                  expression_data = expression_data
+                  )
