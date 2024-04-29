@@ -1,0 +1,15 @@
+# Code written by NLiu: duduandquan@outlook.com Github: dudu
+# use cytotrace2 to predict absolute developmental potential of CART_T in different clusters or orig.ident
+----
+# installation R pakege
+devtools::install_github("digitalcytometry/cytotrace2", subdir = "cytotrace2_r") #installing
+library(CytoTRACE2) #loading
+# load rds
+CART_T <- readRDS("C:/Users/dudua/Documents/CART_T.rds")
+# extract expression data
+expression_data <- CART_T[["RNA"]]@counts
+# running CytoTRACE 2 main function - cytotrace2 - with default parameters
+cytotrace2_result <- cytotrace2(expression_data)
+# extract annotation data
+annotation_cluster <- CART_T[["seurat_clusters"]]
+annotation <- CART_T[["orig.ident"]]
