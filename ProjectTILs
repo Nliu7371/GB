@@ -1,1 +1,68 @@
+```{r}
+data.seurat <- CART_T
+#Project data into TIL atlas
+
+library(ProjecTILs)
+ref <- load.reference.map()
+
+data.projected <- make.projection(data.seurat, ref=ref, filter.cells = F)
+data.projected <- cellstate.predict(ref=ref, query=data.projected)
+
+#See result of projection
+#```{r fig.height=2.5}
+
+all <- plot.projection(ref=ref, query=data.projected)
+
+il10.sub <- subset(data.projected, subset=condition=="IL10")
+wt.sub <- subset(data.projected, subset=condition=="WT")
+
+il10.umap <- plot.projection(ref=ref, query=il10.sub, linesize = 0.5) + NoLegend() + ggtitle("IL10") + ylim(-8.5,9)
+wt.umap <- plot.projection(ref=ref, query=wt.sub, linesize = 0.5) + NoLegend() + ggtitle("WT") + ylim(-8.5,9)
+
+il10.comp <- plot.statepred.composition(ref=ref, query = il10.sub, metric = "percent")
+wt.comp <- plot.statepred.composition(ref=ref, query = wt.sub, metric = "percent")
+
+p <- il10.umap + wt.umap
+p
+
+ggsave("plots/projected_umap.pdf",plot=p, width=8,height=5)
+
+#(il10.umap + wt.umap) / (il10.comp + wt.comp) 
+```
+
+Summarize composition barplot
+```{r}
+states_all <- levels(ref$functional.cluster)
+palette <- c("#edbe2a", "#A58AFF", "#53B400", "#F8766D", 
+                "#00B6EB", "#d1cfcc", "#FF0000", "#87f6a5", "#e812dd")
+
+names(palette) <- states_all
+
+data.list <- list("WT"=wt.sub, "IL10"=il10.sub)
+
+m <- matrix(nrow=length(names(data.list)), ncol = length(states_all))
+rownames(m) <- names(data.list)
+colnames(m) <- states_all
+for (i in seq_along(data.list)) {
+   tb <- table(factor(data.list[[i]]$functional.cluster, levels = states_all))
+   m[i,] <- tb * 100/sum(tb)
+}
+
+melt <- melt(m)
+colnames(melt) <- c("Condition", "Cell_state","Percent")
+
+p <- ggplot(melt, aes(x = Condition, y = Percent, fill = Cell_state)) + geom_bar(stat = "identity", position = "stack") + 
+            scale_fill_manual(values=palette) + theme_light() + theme(legend.position = "right")
+
+p
+
+ggsave("plots/projected_barplot_norm.pdf",plot=p, width=3.5,height=4.5)
+```
+
+Radar plots
+```{r fig.height=4}
+plot.states.radar(ref=ref, query = data.list, min.cells=20, 
+      genes4radar = c("Cd4","Cd8a","Tcf7","Ccr7","Il7r","Gzmb","Prf1","Pdcd1","Havcr2","Cd69","Mki67"))
+
+```
 
