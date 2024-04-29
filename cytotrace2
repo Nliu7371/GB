@@ -22,3 +22,12 @@ plots__cluster <- plotData(cytotrace2_result = cytotrace2_result,
                   annotation = annotation_cluster,
                   expression_data = expression_data
                   )
+#Visualizing the results
+plots$CytoTRACE2_UMAP
+plots$CytoTRACE2_Boxplot_byPheno
+plots$CytoTRACE2_Potency_UMAP
+plots$CytoTRACE2_Relative_UMAP
+plots$Phenotype_UMAP
+
+#save plots
+ggsave("C:/Users/dudua/Documents/plots/CytoTRACE2/CytoTRACE2_Relative_UMAP.pdf",plot = plots$CytoTRACE2_Relative_UMAP, height=4, width=4)
