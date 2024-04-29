@@ -1,6 +1,6 @@
 # Code written by NLiu: duduandquan@outlook.com Github: dudu
 # use cytotrace2 to predict absolute developmental potential of CART_T in different clusters or orig.ident
-----
+```
 # installation R pakege
 devtools::install_github("digitalcytometry/cytotrace2", subdir = "cytotrace2_r") #installing
 library(CytoTRACE2) #loading
@@ -31,3 +31,4 @@ plots$Phenotype_UMAP
 
 #save plots
 ggsave("C:/Users/dudua/Documents/plots/CytoTRACE2/CytoTRACE2_Relative_UMAP.pdf",plot = plots$CytoTRACE2_Relative_UMAP, height=4, width=4)
+```
