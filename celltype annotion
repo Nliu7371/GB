@@ -1,5 +1,3 @@
-
-
 ```
 #https://doi.org/10.1038/s41586-023-06816-9 2022.Nature <Dictionary of immune responses to cytokines at single-cell resolution>
 CART_combined_new <- readRDS("J:/10x sc-RNA seq/云分析/CART_D5_D14_D21/CART_D5_D14_D21/CART_combined_new.rds")
@@ -18,6 +16,46 @@ marker_genes <- c("Ptprc", "Cd3g", "Cd3e", "Cd4", "Cd8a", "Cd8b1", "Trac", "Trbc
                   "Pecam1", "Mcpt4", "Fcer1a", "Kit", "Stfa2l1", "C4b", "Dcn", 
                   "Emcn", "Ecscr", "Hbb-bs", "Krt7", "Krt18", "Lyz1", "Marco", "Cd63", 
                   "Folr2", "Ly6g", "Mmp9", "Ccdc184", "Klrb1b", "Fam184b")
-p_makers <- DotPlot(CART_combined_new, features = marker_genes, scale = T, assay = "RNA")+ theme(axis.text.x = element_text(angle = 45,hjust = 1))
-ggsave(plot = p_makers, filename = "markers_by_celltype.pdf",width = 20,height = 12)
+marker_genes_small <- c(
+  "Ptprc", 
+  "Cd19", "Ms4a1", "Cd79a", "Cd79b", 
+  "H2-Ab1", "H2-Eb1", 
+  "Cd3g", "Cd3e", "Nkg7", "Tcrg-C1", "Tcrg-C2",  
+  "Itgae", "Foxp3", "Ctla4", "Il2ra", "Tnfrsf4", "Pdcd1", "Icos", "Cd28", "Mki67", "Gzma", "Gzmb", "Ncr1",
+  "Ccr6", "Ccdc184", "Klrb1b", "Fam184b", "Cd68", "Ly6c2",
+  "Lag3", "Havcr1", "Sell", "Siglech", "Irf8", "Itgax", "Btla", "Havcr2",
+  "Cd207", "Cd86", "Cd40", "Ly75", "Cd24a", "Xcr1", "Clec9a", "Vwf", "Lyz2", "Mgl2", "Sirpa", "Adora2a",
+  "Ccr7", "Apol7c", "Cd63", "Tnfrsf9", "H2-M2", "Fut4", "Cd80", "C1qa", "Lyz1", "Marco",  "Folr2", "Siglec1",
+  "Ms4a7", "Mertk", "Itgam", "Csf1r", "Adgre1", "Ccr2", "Cd14", "Fcgr3", "Ifih1",
+  "Isg15", "Cd33", "Ly6g", "Stfa2l1", "Mmp9", "Mcpt4", "Fcer1a", "Cd69", "Ly6c1","Nrp1", "Pecam1", "Emcn", "Thbd", "Lyve1", "Prox1", "Ecscr", "Col1a2",
+  "C4b", "Dcn"
+)
 
+p_makers <- DotPlot(CART_combined_new, features = marker_genes, scale = T, assay = "RNA")+ theme(axis.text.x = element_text(angle = 45,hjust = 1))
+#ggsave(plot = p_makers, filename = "markers_by_celltype.pdf",width = 20,height = 12)
+ggsave("C:/Users/dudua/Documents/plots/markers_by_celltype.pdf",plot = p_makers, width = 20,height = 12)
+
+
+cluster_to_celltype <- c(
+  '1' = 'B_cells', '7' = 'B_cells', '22' = 'B_cells',
+  '0' = 'T_cells', '2' = 'T_cells', '5' = 'T_cells', '10' = 'T_cells', '12' = 'T_cells', '13' = 'T_cells', '17' = 'T_cells','19' = 'T_cells','20' = 'T_cells',
+  '15' = 'NK',
+  '11' = 'pDCs',
+  '16' = 'cDC1s',
+  '18' = 'MigDC',
+  '3' = 'Neutrophils', '8' = 'Neutrophils', '14' = 'Neutrophils',
+  '9' = 'Macrophage', '21' = 'Macrophage', 
+  '4' = 'Monocytes', '6' = 'Monocytes', 
+  '23' = 'Basophil',
+  '24' = 'Endothelial_cells'
+)
+
+CART_combined_new@meta.data$celltype <- cluster_to_celltype[as.character(CART_combined_new@meta.data$seurat_clusters)]
+head(CART_combined_new@meta.data$celltype)
+colnames(CART_combined_new@meta.data)
+CART_combined_new@meta.data$celltype <- factor(CART_combined_new@meta.data$celltype, 
+                                          levels = c("Endothelial_cells","Basophil","Neutrophils","Monocytes","Macrophage","MigDC","cDC1s","pDCs", "NK","T_cells", "B_cells"))
+p_all_markers = DotPlot(CART_combined_new, features = marker_genes_small, scale = T, assay='RNA', group.by = 'celltype')+ theme(axis.text.x = element_text(angle = 90,hjust = 1))
+p_umap = DimPlot(CART_combined_new, reduction = "umap", group.by = "celltype", label = TRUE)
+ggsave("C:/Users/dudua/Documents/plots/Expression of cell type marker genes.pdf",plot = p_all_markers, width = 20,height = 8)
+```
