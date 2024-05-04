@@ -16,7 +16,7 @@ library(harmony)
 library(Nebulosa)
 library(data.table)
 library(gridExtra)
-library(CytoTRACE)
+library(CytoTRACE2)
 
 # Signatures
 sign_term_trem2 <- readLines("E:/Work/Signatures/Resident Memory/Synder_et_al_2019/sign_Term_Trem_Synder_bis.txt"))
