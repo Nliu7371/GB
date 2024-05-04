@@ -1,1 +1,23 @@
 
+
+```
+#https://doi.org/10.1038/s41586-023-06816-9 2022.Nature <Dictionary of immune responses to cytokines at single-cell resolution>
+CART_combined_new <- readRDS("J:/10x sc-RNA seq/云分析/CART_D5_D14_D21/CART_D5_D14_D21/CART_combined_new.rds")
+marker_genes <- c("Ptprc", "Cd3g", "Cd3e", "Cd4", "Cd8a", "Cd8b1", "Trac", "Trbc2", 
+                  "Tcrg-C1", "Tcrg-C2", "Cd19", "Ms4a1", "Cd79a", "Cd79b", "Sdc1", 
+                  "Aicda", "Itgam", "Itgax", "Itgae", "Cd68", "Csf1r", "C1qa", "Cx3cr1", 
+                  "Adgre1", "Siglec1", "Ly6c1", "Ly6c2", "Ccr2", "H2-Ab1", "H2-Eb1", 
+                  "Cd14", "Fcgr3", "Ms4a7", "Thbd", "Lyz2", "Mgl2", "Gzma", "Gzmb", 
+                  "Ncr1", "Nkg7", "Nrp1", "Cd33", "Fut4", "Foxp3", "Ctla4", "Pdcd1", 
+                  "Btla", "Lag3", "Havcr1", "Havcr2", "Adora2a", "Il2ra", "Cd69", "Icos", 
+                  "Tnfrsf4", "Tnfrsf9", "Cd27", "Cd28", "Sell", "Ccr7", "H2-M2", "Apol7c", 
+                  "Siglech", "Irf8", "Irf4", "Cd207", "Epcam", "Cd80", "Cd86", "Cd40", 
+                  "Cd40lg", "Mertk", "Ly75", "Cd24a", "Ccr6", "Il7r", "Cxcr6", "Il22", 
+                  "Sirpa", "Xcr1", "Clec9a", "Batf3", "Zbtb46", "Tmem173", "Ifih1", 
+                  "Isg15", "Gbp2", "Cxcl10", "Mki67", "Col1a2", "Lyve1", "Prox1", "Vwf", 
+                  "Pecam1", "Mcpt4", "Fcer1a", "Kit", "Stfa2l1", "C4b", "Dcn", 
+                  "Emcn", "Ecscr", "Hbb-bs", "Krt7", "Krt18", "Lyz1", "Marco", "Cd63", 
+                  "Folr2", "Ly6g", "Mmp9", "Ccdc184", "Klrb1b", "Fam184b")
+p_makers <- DotPlot(CART_combined_new, features = marker_genes, scale = T, assay = "RNA")+ theme(axis.text.x = element_text(angle = 45,hjust = 1))
+ggsave(plot = p_makers, filename = "markers_by_celltype.pdf",width = 20,height = 12)
+
