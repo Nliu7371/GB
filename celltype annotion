@@ -20,6 +20,7 @@ library(msigdbr)
 library(escape)
 library(ProjecTILs)
 library(scCustomize)
+library(SingleCellExperiment)
 
 
 library(sctransform)
@@ -47,7 +48,10 @@ library(stringr)
 library(dplyr)
 library(ggbeeswarm)
 library(scales)
-library(reshape2
+library(reshape2)
+library(muscat)
+library(purrr)
+
 ```
 #annotion markers refer to https://doi.org/10.1038/s41586-023-06816-9 2022.Nature <Dictionary of immune responses to cytokines at single-cell resolution>
 CART_combined_new <- readRDS("J:/10x sc-RNA seq/云分析/CART_D5_D14_D21/CART_D5_D14_D21/CART_combined_new.rds")
