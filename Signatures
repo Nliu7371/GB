@@ -1,3 +1,6 @@
+```
+#refer to https://github.com/p-gueguen/SUV39H1_CAR_T
+
 # loading pakages
 library(Seurat)
 library(ggplot2)
@@ -19,10 +22,186 @@ library(gridExtra)
 library(CytoTRACE2)
 
 # Signatures
-sign_term_trem2 <- readLines("E:/Work/Signatures/Resident Memory/Synder_et_al_2019/sign_Term_Trem_Synder_bis.txt"))
+sign_memory <- read.csv("J:/10x sc-RNA seq/signatures/stemness_membery.csv", header=T)[,1]
+# 假设CART_T是一个Seurat对象且特征数据存储在RNA测定中
+gene_names_in_CART_T <- rownames(CART_T[["RNA"]])
+# 检查sign_memory中的每个名称是否存在于gene_names_in_CART_T中
+exists_in_CART_T <- sign_memory %in% gene_names_in_CART_T
+# 打印出存在性检查的结果
+exists_in_CART_T
+CART_T_stem_mem <- AddModuleScore(CART_T,features = sign_memory,name = "Stem_Memery", assay = "RNA")
+head(CART_T_stem_mem@meta.data)
+colnames(CART_T_stem_mem@meta.data)[16] <- 'Stem_Score'
+VlnPlot(CART_T_stem_mem,features = 'Stem_Score', 
+        pt.size = 0,group.by = "orig.ident")
+
+Cytotoxic Effectors
+sign_cytoxic <- read.csv("J:/10x sc-RNA seq/signatures/Cytotoxic Effectors.csv", header=T)[,1]
+exists_in_CART_T <- sign_cytoxic %in% gene_names_in_CART_T
+exists_in_CART_T
+CART_T_cytoxic <- AddModuleScore(CART_T,features = sign_cytoxic,name = "cytoxic", assay = "RNA")
+colnames(CART_T_cytoxic@meta.data)[16] <- 'cytoxic'
+VlnPlot(CART_T_cytoxic,features = 'cytoxic', 
+         pt.size = 0,group.by = "orig.ident")
+
+Resident Memory
+sign_RM <- read.csv("J:/10x sc-RNA seq/signatures/Resident Memory.csv", header=T)[,1]
+exists_in_CART_T <- sign_RM %in% gene_names_in_CART_T
+exists_in_CART_T
+CART_T_RM <- AddModuleScore(CART_T,features = sign_RM,name = "RM", assay = "RNA")
+colnames(CART_T_RM@meta.data)[16] <- 'RM'
+VlnPlot(CART_T_RM,features = 'RM', 
+         pt.size = 0,group.by = "orig.ident")
+
+Circulating
+sign_Circulating <- read.csv("J:/10x sc-RNA seq/signatures/Circulating.csv", header=T)[,1]
+exists_in_CART_T <- sign_Circulating %in% gene_names_in_CART_T
+exists_in_CART_T
+CART_T_Circulating <- AddModuleScore(CART_T,features = sign_Circulating,name = "Circulating", assay = "RNA")
+colnames(CART_T_Circulating@meta.data)[16] <- 'Circulating'
+VlnPlot(CART_T_Circulating,features = 'Circulating', 
+         pt.size = 0,group.by = "orig.ident")
+
+Effector-like
+sign_Effector_like <- read.csv("J:/10x sc-RNA seq/signatures/Effector-like.csv", header=T)[,1]
+exists_in_CART_T <- sign_Effector_like %in% gene_names_in_CART_T
+exists_in_CART_T
+CART_T_Effector_like <- AddModuleScore(CART_T,features = sign_Effector_like,name = "Effector-like", assay = "RNA")
+colnames(CART_T_Effector_like@meta.data)[16] <- 'Effector-like'
+VlnPlot(CART_T_Effector_like,features = 'Effector-like', 
+         pt.size = 0,group.by = "orig.ident")
+
+
+Progenitor Exhausted
+sign_Pex <- read.csv("J:/10x sc-RNA seq/signatures/Progenitor Exhausted.csv", header=T)[,1]
+exists_in_CART_T <- sign_Pex %in% gene_names_in_CART_T
+exists_in_CART_T
+CART_T_Pex <- AddModuleScore(CART_T,features = sign_Pex,name = "Progenitor Exhausted", assay = "RNA")
+colnames(CART_T_Pex@meta.data)[16] <- 'Progenitor Exhausted'
+VlnPlot(CART_T_Pex,features = 'Progenitor Exhausted', 
+         pt.size = 0,group.by = "orig.ident")
+
+Terminally Exhausted
+sign_Tex <- read.csv("J:/10x sc-RNA seq/signatures/Terminally Exhausted.csv", header=T)[,1]
+exists_in_CART_T <- sign_Tex %in% gene_names_in_CART_T
+exists_in_CART_T
+CART_T_Tex <- AddModuleScore(CART_T,features = sign_Tex,name = "Terminally Exhausted", assay = "RNA")
+colnames(CART_T_Tex@meta.data)[16] <- 'Terminally Exhausted'
+VlnPlot(CART_T_Tex,features = 'Terminally Exhausted', 
+         pt.size = 0,group.by = "orig.ident")
+
+Memory Precursors
+sign_Pme <- read.csv("J:/10x sc-RNA seq/signatures/Memory Precursors.csv", header=T)[,1]
+exists_in_CART_T <- sign_Pme %in% gene_names_in_CART_T
+exists_in_CART_T
+CART_T_Pme <- AddModuleScore(CART_T,features = sign_Pme,name = "Memory Precursors", assay = "RNA")
+colnames(CART_T_Pme@meta.data)[16] <- 'Memory Precursors'
+VlnPlot(CART_T_Pme,features = 'Memory Precursors', 
+         pt.size = 0,group.by = "orig.ident")
+
+
+Progenitor Exhausted.1
+sign_Pex.1 <- read.csv("J:/10x sc-RNA seq/signatures/Progenitor Exhausted.1.csv", header=T)[,1]
+exists_in_CART_T <- sign_Pex.1 %in% gene_names_in_CART_T
+exists_in_CART_T
+CART_T_Pex.1 <- AddModuleScore(CART_T,features = sign_Pex.1,name = "Progenitor Exhausted.1", assay = "RNA")
+colnames(CART_T_Pex.1@meta.data)[16] <- 'Progenitor Exhausted.1'
+VlnPlot(CART_T_Pex.1,features = 'Progenitor Exhausted.1', 
+         pt.size = 0,group.by = "orig.ident")
+
+
+Terminally Exhausted.1
+
+sign_Tex.1 <- read.csv("J:/10x sc-RNA seq/signatures/sig.csv", header=T)[,1]
+exists_in_CART_T <- sign_Tex.1 %in% gene_names_in_CART_T
+exists_in_CART_T
+CART_T_Tex.1 <- AddModuleScore(CART_T,features = sign_Tex.1,name = "Terminally Exhausted.1", assay = "RNA")
+colnames(CART_T_Tex.1@meta.data)[16] <- 'Terminally Exhausted.1'
+VlnPlot(CART_T_Tex.1,features = 'Terminally Exhausted.1', 
+         pt.size = 0,group.by = "orig.ident")
+
+DNMT3A Multipotency
+sign_DNMT3A <- read.csv("J:/10x sc-RNA seq/signatures/sig.csv", header=T)[,2]
+exists_in_CART_T <- sign_DNMT3A %in% gene_names_in_CART_T
+exists_in_CART_T
+CART_T_DNMT3A <- AddModuleScore(CART_T,features = sign_DNMT3A,name = "DNMT3A Multipotency", assay = "RNA")
+colnames(CART_T_DNMT3A@meta.data)[16] <- 'DNMT3A Multipotency'
+VlnPlot(CART_T_DNMT3A,features = 'DNMT3A Multipotency', 
+         pt.size = 0,group.by = "orig.ident")
+
+Cytotoxic CD8
+sign_ccd8 <- read.csv("J:/10x sc-RNA seq/signatures/Cytotoxic CD8.csv", header=T)[,1]
+exists_in_CART_T <- sign_ccd8 %in% gene_names_in_CART_T
+exists_in_CART_T
+CART_T_ccd8 <- AddModuleScore(CART_T,features = sign_ccd8,name = "Cytotoxic CD8", assay = "RNA")
+colnames(CART_T_ccd8@meta.data)[16] <- 'Cytotoxic CD8'
+VlnPlot(CART_T_ccd8,features = 'Cytotoxic CD8', 
+         pt.size = 0,group.by = "orig.ident")
+
+Exhausted
+sign_ex <- read.csv("J:/10x sc-RNA seq/signatures/Exhausted.csv", header=T)[,1]
+exists_in_CART_T <- sign_ex %in% gene_names_in_CART_T
+exists_in_CART_T
+CART_T_ex <- AddModuleScore(CART_T,features = sign_ex,name = "Exhausted", assay = "RNA")
+colnames(CART_T_ex@meta.data)[13] <- 'Exhausted'
+VlnPlot(CART_T_ex,features = 'Exhausted', 
+         pt.size = 0,group.by = "orig.ident")
+
+Stem-like
+sign_Stem <- read.csv("J:/10x sc-RNA seq/signatures/Stem-like.csv", header=T)[,1]
+exists_in_CART_T <- sign_Stem %in% gene_names_in_CART_T
+exists_in_CART_T
+CART_T_Stem <- AddModuleScore(CART_T,features = sign_Stem,name = "Stem-like", assay = "RNA")
+colnames(CART_T_Stem@meta.data)[13] <- 'Stem-like'
+VlnPlot(CART_T_Stem,features = 'Stem-like', 
+         pt.size = 0,group.by = "orig.ident")
+
+Cell Cycle
+sign_Cell_Cycle <- read.csv("J:/10x sc-RNA seq/signatures/Cell Cycle.csv", header=T)[,1]
+exists_in_CART_T <- sign_Cell_Cycle %in% gene_names_in_CART_T
+exists_in_CART_T
+CART_T_Cell_Cycle <- AddModuleScore(CART_T,features = sign_Cell_Cycle,name = "Cell_Cycle", assay = "RNA")
+colnames(CART_T_Cell_Cycle@meta.data)[13] <- 'Cell_Cycle'
+VlnPlot(CART_T_Cell_Cycle,features = 'Cell_Cycle', 
+         pt.size = 0,group.by = "orig.ident")
+
+Long  Persistence
+sign_LR <- read.csv("J:/10x sc-RNA seq/signatures/Long  Persistence.csv", header=T)[,1]
+exists_in_CART_T <- sign_LR %in% gene_names_in_CART_T
+exists_in_CART_T
+CART_T_Cell_Cycle <- AddModuleScore(CART_T,features = sign_LR,name = "Long  Persistence", assay = "RNA")
+colnames(CART_T_LR@meta.data)[13] <- 'Long  Persistence'
+VlnPlot(CART_T_LR,features = 'Long  Persistence', 
+         pt.size = 0,group.by = "orig.ident")
+
+
 sign_memory <- read.csv("E:/Work/Signatures/Stemness/signature_memory_stemness.csv", h = F)[,1])
 sign_senescence <- read.csv("E:/Work/Signatures/Senescence/sign_sag.txt", h = F)[,1])
 sign_apoptosis <- read.csv("E:/Work/Signatures/Signatures Papier Leticia/Apoptosis.txt", h = F)[,1])
 sign_DNA_repair <- read.csv("E:/Work/Signatures/DNA repair/sign_DNA_repair.txt", h = F)[,1])
 sign_core_DNA_repair <- read.csv("E:/Work/Signatures/DNA repair/Core_DNA_damage_repair.txt", h = F)[,1])
 sign_DNA_damage_repair <- read.csv("E:/Work/Signatures/DNA repair/DNA_damage_repair_Knijnenburg.txt", h = F)[,1])
+
+
+
+
+
+
+
+
+
+
+
+sample_ids <- unique(CART_T@meta.data$orig.ident)
+
+# 遍历样本标识符
+for(sample_id in sample_ids) {
+  # 筛选特定样本的数据
+  sample_data <- subset(CART_T, subset = orig.ident == sample_id)
+  
+  # 绘制UMAP图
+  p <- DimPlot(sample_data, reduction = "umap", group.by = "celltype", label = TRUE) + ggtitle(paste("UMAP for Sample", sample_id))
+  
+  # 使用ggsave保存图形
+  ggsave(filename = paste("UMAP_", sample_id, ".pdf", sep = ""), plot = p, width = 8, height = 6)
+}
