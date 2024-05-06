@@ -21,6 +21,11 @@ library(data.table)
 library(gridExtra)
 library(CytoTRACE2)
 
+
+# 设置orig.ident为因子，并指定水平的顺序
+celltype_proportions$orig.ident <- factor(celltype_proportions$orig.ident, 
+                                          levels = c("CART_D5", "CART_D14", "CART_D21"))
+
 # Signatures
 sign_memory <- read.csv("J:/10x sc-RNA seq/signatures/stemness_membery.csv", header=T)[,1]
 # 假设CART_T是一个Seurat对象且特征数据存储在RNA测定中
