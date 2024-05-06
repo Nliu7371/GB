@@ -167,3 +167,20 @@ saveRDS(CART_combined_new, file = "CART_combined_new_celltype")
 library(loupeR)
 create_loupe_from_seurat(CART_combined_new, output_name = "loupe_from_seurat_CART_combined_new_celltype")
 
+```
+setwd("C:/Users/dudua/Documents/plots")
+sample_ids <- unique(CART_T@meta.data$orig.ident)
+# 遍历样本标识符
+for(sample_id in sample_ids) {
+  # 筛选特定样本的数据
+  sample_data <- subset(CART_T, subset = orig.ident == sample_id)
+  
+  # 绘制UMAP图
+  p <- DimPlot(sample_data, reduction = "umap", group.by = "celltype", label = TRUE) + ggtitle(paste("UMAP for Sample", sample_id))
+  
+  # 使用ggsave保存图形
+  ggsave(filename = paste("UMAP_", sample_id, ".pdf", sep = ""), plot = p, width = 5, height = 4)
+}
+```
+
+
