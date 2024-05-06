@@ -23,7 +23,7 @@ library(CytoTRACE2)
 
 
 # 设置orig.ident为因子，并指定水平的顺序
-celltype_proportions$orig.ident <- factor(celltype_proportions$orig.ident, 
+CART_T@meta.data[["orig.ident"]] <- factor(CART_T@meta.data[["orig.ident"]], 
                                           levels = c("CART_D5", "CART_D14", "CART_D21"))
 
 # Signatures
@@ -180,33 +180,115 @@ VlnPlot(CART_T_LR,features = 'Long  Persistence',
          pt.size = 0,group.by = "orig.ident")
 
 
-sign_memory <- read.csv("E:/Work/Signatures/Stemness/signature_memory_stemness.csv", h = F)[,1])
-sign_senescence <- read.csv("E:/Work/Signatures/Senescence/sign_sag.txt", h = F)[,1])
-sign_apoptosis <- read.csv("E:/Work/Signatures/Signatures Papier Leticia/Apoptosis.txt", h = F)[,1])
-sign_DNA_repair <- read.csv("E:/Work/Signatures/DNA repair/sign_DNA_repair.txt", h = F)[,1])
-sign_core_DNA_repair <- read.csv("E:/Work/Signatures/DNA repair/Core_DNA_damage_repair.txt", h = F)[,1])
-sign_DNA_damage_repair <- read.csv("E:/Work/Signatures/DNA repair/DNA_damage_repair_Knijnenburg.txt", h = F)[,1])
+# VP split per 4 conditions
+VlnPlot(suv.car.t.integrated.merged.timepoints.premerged.cd4s.cleaned.cleaned, 
+    c("KLF2"),
+    pt.size = 0.01,
+    split.by = "genotype_timepoint", y.max = 5,
+    cols = c("darkgrey", "firebrick3", "black", "red")
+  ) & theme(axis.title.x = element_blank()) &
+  theme(axis.text.x = element_text(
+    angle = 90,
+    vjust = 0.5,
+    hjust = 1,
+    size = 12
+  )) & geom_signif(
+  comparisons = list(c("Mock D8", "gSUV D8"), c("Mock D28", "gSUV D28")),
+  map_signif_level = TRUE,
+  textsize = 6,
+  test = "wilcox.test",
+  y_position = 4.5,
+) 
 
 
 
+# 假设sign_Cell_Cycle是你的Seurat对象
+p <- VlnPlot(CART_T_Cell_Cycle, features = sign_Cell_Cycle, pt.size = 0, group.by = "orig.ident", 
+             cols = c("darkgrey", "firebrick3", "black")) +
+    theme(axis.title.x = element_blank()) +
+    geom_signif(comparisons = list(c("CART_D5", "CART_D14"), c("CART_D5", "CART_D21")),
+                map_signif_level = TRUE, textsize = 6, test = "wilcox.test", y_position = 0.7) +
+    stat_summary(fun = median, geom = "point", size = 12, colour = "white", shape = 95) +
+    theme(legend.position = "none") +
+    ggtitle("Cell cycle")
 
+# 打印或查看绘图
+print(p)
 
-
-
-
-
-
-
-sample_ids <- unique(CART_T@meta.data$orig.ident)
-
-# 遍历样本标识符
-for(sample_id in sample_ids) {
-  # 筛选特定样本的数据
-  sample_data <- subset(CART_T, subset = orig.ident == sample_id)
-  
-  # 绘制UMAP图
-  p <- DimPlot(sample_data, reduction = "umap", group.by = "celltype", label = TRUE) + ggtitle(paste("UMAP for Sample", sample_id))
-  
-  # 使用ggsave保存图形
-  ggsave(filename = paste("UMAP_", sample_id, ".pdf", sep = ""), plot = p, width = 8, height = 6)
+library(UCell)
+pdf("Lowery_2022_sign_CD4_UCell.pdf", height = 6, width = 7)
+for (i in colnames(Lowery.sign)) {
+  suv.car.t.integrated.merged.timepoints.premerged.cd4s.cleaned <- AddModuleScore_UCell(suv.car.t.integrated.merged.timepoints.premerged.cd4s.cleaned, features = list(Lowery.sign[[i]]), name = i, assay = "RNA")
+  plot(FeaturePlot(suv.car.t.integrated.merged.timepoints.premerged.cd4s.cleaned, paste0( "signature_1",i), pt.size = 0.8, min.cutoff = "q3", max.cutoff = "q97", order = T) + scale_color_paletteer_c("pals::coolwarm") +ggtitle(i))
 }
+dev.off()
+
+
+FeaturePlot(CART_T_Cell_Cycle, features = sign_Cell_Cycle, pt.size = 0.8, min.cutoff = "q3", max.cutoff = "q97", order = T) + scale_color_paletteer_c("pals::coolwarm") 
+
+
+# Remake Density plot - common scale for Mock & KO within each time point, add cell number per condition
+df <- as.data.frame(Embeddings(object = suv.car.t.integrated.merged.timepoints.premerged.cd4s.cleaned, reduction = "umap"))
+df <- cbind(df, suv.car.t.integrated.merged.timepoints.premerged.cd4s.cleaned$timepoint, suv.car.t.integrated.merged.timepoints.premerged.cd4s.cleaned$genotype)
+colnames(df) <- c("UMAP_1", "UMAP_2", "timepoint", "genotype")
+df$timepoint <- factor(x = df$timepoint, levels = c("D8", "D28"))
+df$genotype <- factor(x = df$genotype, levels = c("Mock", "gSUV"))
+df.a <- df %>% filter(timepoint == "D8")
+table(df.a$genotype)
+labels <- c("Mock - 9322 cells", "gSUV - 9629 cells")
+names(labels) <- c("Mock", "gSUV")
+a <- plot(ggplot(data = df.a) +
+            geom_point(data = df.a, aes(x = UMAP_1, y = UMAP_2), color = "lightgrey", size = 0.5) +
+            stat_density_2d(aes(x = UMAP_1, y = UMAP_2, fill = after_stat(level), alpha = (..level..)), bins = 20, geom = "polygon") +
+            theme_classic() +
+            xlim(c(-9, 11)) +
+            ylim(c(-7, 8)) +
+            scale_fill_viridis_c(option = "plasma") +
+            facet_grid(. ~ genotype, labeller = labeller(genotype = labels)) +
+            theme(
+              strip.text.x = element_text(
+                size = 20, color = "black",
+                face = "bold"
+              ),
+              strip.text.y = element_text(
+                size = 20, color = "black",
+                face = "bold"
+              )
+            ))
+labels <- c("Mock - 14073 cells", "gSUV - 13611 cells")
+names(labels) <- c("Mock", "gSUV")
+df.b <- df %>% filter(timepoint == "D28")
+table(df.b$genotype)
+b <- plot(ggplot(data = df.b) +
+            geom_point(data = df.b, aes(x = UMAP_1, y = UMAP_2), color = "lightgrey", size = 0.5) +
+            stat_density_2d(aes(x = UMAP_1, y = UMAP_2, fill = after_stat(level), alpha = (..level..)), bins = 30, geom = "polygon") +
+            theme_classic() +
+            xlim(c(-9, 11)) +
+            ylim(c(-7, 8)) +
+            scale_fill_viridis_c(option = "plasma") +
+            facet_grid(. ~ genotype, labeller = labeller(genotype = labels)) +
+            theme(
+              strip.text.x = element_text(
+                size = 20, color = "black",
+                face = "bold"
+              ),
+              strip.text.y = element_text(
+                size = 20, color = "black",
+                face = "bold"
+              )
+            ))
+
+a + b + plot_layout(ncol = 1) & NoLegend()
+
+
+
+```
+#单个基因 Nebulosa
+genes <- c("BCL2","SATB1","ID3","KLRG1","ZNF683","ID2", "GNLY","GZMK","CX3CR1", "HAVCR2","ENTPD1","S1PR1","RBPJ","FOS","JUN","JUNB","CD69")
+genes <- c("TCF7", "KLF2", "LEF1", "CCR7","SELL","CD27", "IL7R", "GZMB", "GZMA", "PDCD1",  "LAG3", "TOX")
+genes <- c("BCL2","GZMK")
+pdf(file = "Nebulosa_CD4.pdf", height = 3, width = 3)
+for (i in 1:length(genes)){
+  plot(plot_density(suv.car.t.integrated.merged.timepoints.premerged.cd4s.cleaned, features = genes[i],  reduction = "umap") & NoLegend() & NoAxes())
+}
+dev.off()
