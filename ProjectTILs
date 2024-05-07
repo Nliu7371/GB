@@ -5,6 +5,24 @@ data.seurat <- CART_T
 library(ProjecTILs)
 ref <- load.reference.map()
 
+querydata_D5 <- subset(querydata, orig.ident=='CART_D5')
+querydata_D14 <- subset(querydata, orig.ident=='CART_D14')
+querydata_D21 <- subset(querydata, orig.ident=='CART_D21')
+
+palette <- c("#edbe2a", "#A58AFF", "#53B400", "#F8766D", "#00B6EB", "#d1cfcc", "#FF0000",
+    "#87f6a5", "#e812dd", "#777777")
+names(palette) <- c(levels(ref$functional.cluster), "NA")
+
+p<-DimPlot(querydata, group.by = "functional.cluster", cols = palette)
+ggsave("querydata projected_umap.pdf",plot=p, width=6,height=4)
+p_D5 <- DimPlot(querydata_D5, group.by = "functional.cluster", cols = palette)
+ggsave("querydata_D5 projected_umap.pdf",plot=p_D5, width=6,height=4)
+p_D14 <- DimPlot(querydata_D14, group.by = "functional.cluster", cols = palette)
+ggsave("querydata_D14 projected_umap.pdf",plot=p_D14, width=6,height=4)
+p_D21 <- DimPlot(querydata_D21, group.by = "functional.cluster", cols = palette)
+ggsave("querydata_D21 projected_umap.pdf",plot=p_D21, width=6,height=4)
+
+
 data.projected <- make.projection(data.seurat, ref=ref, filter.cells = F)
 data.projected <- cellstate.predict(ref=ref, query=data.projected)
 
