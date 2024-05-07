@@ -12,12 +12,13 @@ library(CellChat)
 library(ggalluvial)
 library(Seurat)
 
+#单样本数据的分析
 #加载已经经过细胞注释的Seurat对象
 CART_
 ##提取表达矩阵和细胞类别创建cellchat对象
 data.input <- GetAssayData(CART_combined_new, assay = "RNA", slot = "data")
 identity <- subset(CART_combined_new@meta.data, select = "celltype")
-cellchat <- createCellChat(object = CART_combined_new, meta = identity,  group.by = "celltype")
+cellchat <- createCellChat(object = data.input, meta = identity,  group.by = "celltype")
 #导入配受体数据库（人或者鼠）
 #CellChatDB <- CellChatDB.human
 CellChatDB <- CellChatDB.mouse
@@ -55,4 +56,380 @@ par(mfrow = c(1,2), xpd=TRUE)
 netVisual_circle(cellchat@net$count, vertex.weight = groupSize, weight.scale = T, label.edge= F, title.name = "Number of interactions")
 
 #互作的权重
-netVisual_circle(cellchat@net$weight, vertex.weight = groupSize, weight.scale = T, label.edge= F, title.name = "Interaction weights/strength")
+# 打开PNG图形设备，指定文件名和图形尺寸
+pdf("Interaction_Weights_Strength.pdf", width = 6, height = 7.5)
+# 生成并绘制图形
+netVisual_circle(cellchat@net$weight, vertex.weight = groupSize, weight.scale = TRUE, label.edge= FALSE, title.name = "Interaction weights/strength")
+# 关闭图形设备
+dev.off()
+
+#互作的数量
+pdf("Number of interactions.pdf", width = 6, height = 7.5)
+# 生成并绘制图形
+netVisual_circle(cellchat@net$count, vertex.weight = groupSize, weight.scale = T, label.edge= F, title.name = "Number of interactions")
+#关闭图形设备
+dev.off()
+
+#箭头发出的细胞为表达配体，箭头指向的细胞表达受体。细胞圆圈的大小代表细胞数量。
+
+##每个细胞如何跟别的细胞互作（互作的强度或概率图）
+mat <- cellchat@net$weight
+for (i in 1:nrow(mat)) {
+  mat1 <- matrix(0, nrow = nrow(mat), ncol = ncol(mat), dimnames = dimnames(mat))
+  mat1[i, ] <- mat[i, ]
+  netVisual_circle(mat1, vertex.weight = groupSize, weight.scale = T, edge.weight.max = max(mat), title.name = rownames(mat)[i])
+}
+# 计算每个细胞与其他细胞的互作图并保存
+for (i in 1:nrow(mat)) {
+    # 为每个图创建一个新的文件名
+    file_name <- sprintf("Interactioweightn_%s.pdf", rownames(mat)[i])
+    # 打开Pdf图形设备
+    pdf(file_name, width = 5, height = 5)  # 可以根据需要调整图像的尺寸
+    # 创建只有当前细胞的互作矩阵
+    mat2 <- matrix(0, nrow = nrow(mat), ncol = ncol(mat), dimnames = dimnames(mat))
+    mat2[i, ] <- mat[i, ]
+    # 生成并绘制图形
+    netVisual_circle(mat2, vertex.weight = groupSize, weight.scale = TRUE, edge.weight.max = max(mat), title.name = rownames(mat)[i])
+    # 关闭Pdf图形设备，完成保存
+    dev.off()
+}
+
+
+##每个细胞如何跟别的细胞互作（number+of+interaction图）
+mat <- cellchat@net$count
+#par(mfrow = c(2,1), xpd=TRUE)
+for (i in 1:nrow(mat)) {
+  mat2 <- matrix(0, nrow = nrow(mat), ncol = ncol(mat), dimnames = dimnames(mat))
+  mat2[i, ] <- mat[i, ]
+  netVisual_circle(mat2, vertex.weight = groupSize, weight.scale = T, edge.weight.max = max(mat), title.name = rownames(mat)[i])
+}
+# 计算每个细胞与其他细胞的互作图并保存
+for (i in 1:nrow(mat)) {
+    # 为每个图创建一个新的文件名
+    file_name <- sprintf("Interactioncount_%s.pdf", rownames(mat)[i])
+    # 打开Pdf图形设备
+    pdf(file_name, width = 5, height = 5)  # 可以根据需要调整图像的尺寸
+    # 创建只有当前细胞的互作矩阵
+    mat2 <- matrix(0, nrow = nrow(mat), ncol = ncol(mat), dimnames = dimnames(mat))
+    mat2[i, ] <- mat[i, ]
+    # 生成并绘制图形
+    netVisual_circle(mat2, vertex.weight = groupSize, weight.scale = TRUE, edge.weight.max = max(mat), title.name = rownames(mat)[i])
+    # 关闭Pdf图
+将三个分组的数据分别提取出来形设备，完成保存
+    dev.off()
+}
+
+#refer to https://htmlpreview.github.io/?https://github.com/jinworks/CellChat/blob/master/tutorial/CellChat-vignette.html
+#准备 CellChat 分析所需的输入数据
+
+
+
+#多样本cellchat分析
+#将三个分组的数据分别提取出来
+unique(CART_combined_new@meta.data$orig.ident)
+#[1] "CART_D5"  "CART_D14" "CART_D21"
+unique(CART_combined_new@meta.data$celltype)
+#[1] "Monocytes"         "T_cells"          
+# [3] "Macrophage"        "Neutrophils"      
+# [5] "pDCs"              "cDC1s"            
+# [7] "NK"                "Basophil"         
+# [9] "B_cells"           "MigDC"            
+#[11] "Endothelial_cells"
+#准备cellchat的输入对象，提取每一组的seurat对象，
+CART_D5 <- subset(CART_combined_new, orig.ident=='CART_D5')
+CART_D14 <- subset(CART_combined_new, orig.ident=='CART_D14')
+CART_D21 <- subset(CART_combined_new, orig.ident=='CART_D21')
+data.list <- list(CART_D5, CART_D14, CART_D21)
+#从seurat对象开始创建cellchat对象，并将他们合并
+# 假设 data.list 包含三个Seurat对象：CART_D5, CART_D14, CART_D21
+# 转换 Seurat 对象为 CellChat 对象
+# 加载CellChat数据库（假设使用小鼠数据）
+data(CellChatDB.mouse)
+CellChatDB <- CellChatDB.mouse
+# 可以筛选特定的信号通路，例如分泌信号通路
+CellChatDB.use <- subsetDB(CellChatDB, search = "Secreted Signaling")
+# 假设 data.list 是一个包含Seurat对象的列表
+cellchat_list <- lapply(data.list, function(x) {
+  # 创建一个空的CellChat对象
+  cc <- createCellChat(object = x, group.by = "celltype", assay = "RNA")
+    
+  # 将筛选后的数据库赋值给每个CellChat对象
+  cc@DB <- CellChatDB.use
+
+  # 初始化CellChat对象
+  cc <- subsetData(cc)
+  cc <- identifyOverExpressedGenes(cc)
+  cc <- identifyOverExpressedInteractions(cc)
+  cc <- projectData(cc, PPI.mouse)
+  cc <- computeCommunProb(cc, raw.use = TRUE)
+  cc <- filterCommunication(cc, min.cells = 3)
+  df.net <- subsetCommunication(cc)
+  cc <- computeCommunProbPathway(cc)
+  cc <- netAnalysis_computeCentrality(cc, slot.name = "netP")
+  cc <- aggregateNet(cc)
+  return(cc)
+})
+
+# 设置名称
+names(cellchat_list) <- c("CART_D5", "CART_D14", "CART_D21")
+# 合并 CellChat 对象
+cellchat <- mergeCellChat(cellchat_list, add.names = names(cellchat_list))
+
+# Users can now export the merged CellChat object and the list of the two separate objects for later use
+save(cellchat_list, file = "cellchat_list_CART.RData")
+save(cellchat, file = "cellchat_merged_CART.RData")
+
+> 第一部分：识别改变的相互作用和细胞群
+#比较相互作用的总数和相互作用强度
+# 打开Pdf图形设备，指定文件名和图形尺寸
+pdf("Interaction_Weights_numbers.pdf", width = 6, height = 6)
+# 生成并绘制图形
+gg1 <- compareInteractions(cellchat, show.legend = F, group = c(1,2,3))
+gg2 <- compareInteractions(cellchat, show.legend = F, group = c(1,2,3), measure = "weight")
+gg1 + gg2
+# 关闭图形设备
+dev.off()
+
+#比较不同细胞群之间的相互作用数量和相互作用强度
+pdf("diff_interaction_plots.pdf", width = 10, height = 7)
+par(mfrow = c(1,2), xpd=TRUE)
+netVisual_diffInteraction(cellchat, weight.scale = T)
+netVisual_diffInteraction(cellchat, weight.scale = T, measure = "weight")
+dev.off()
+
+#CellChat 对象的 net 插槽包含了几个子插槽（prob, pval, LRs, count, weight），每个都保存了不同类型的网络数据。
+#理解 net 插槽结构
+#根据输出，cellchat@net 包含以下内容：
+#prob: 交互的概率矩阵
+#pval: 交互的p值矩阵
+#LRs: 参与交互的配体-受体对列表
+#count: 交互计数矩阵
+#weight: 交互权重矩阵
+
+#热图显示两个数据集中不同细胞群体之间的相互作用数量或相互作用强度的差异
+gg1 <- netVisual_heatmap(cellchat)
+#> Do heatmap based on a merged object
+gg2 <- netVisual_heatmap(cellchat, measure = "weight")
+#> Do heatmap based on a merged object
+combined_plot <- gg1 + gg2
+pdf("netVisual_heatmap_plots.pdf", width = 10, height = 7)
+print(combined_plot)
+dev.off()
+```
+
+#圆形图显示多个数据集中不同细胞群之间的相互作用数量或相互作用强度
+# 打开PDF图形设备，指定文件名和图形尺寸
+pdf("Network_Circle_Plots.pdf", width = 10, height = 9)
+# 设置图形布局参数，例如在一行中显示三个图形
+par(mfrow = c(1,3), xpd = TRUE)
+# 计算最大权重
+weight.max <- getMaxWeight(cellchat_list, attribute = c("idents","count"))
+# 循环遍历cellchat列表，为每个cellchat生成一个圆形网络图
+for (i in 1:length(cellchat_list)) {
+    netVisual_circle(cellchat_list[[i]]@net$count, weight.scale = TRUE, label.edge = FALSE, edge.weight.max = weight.max[2], edge.width.max = 12, title.name = paste0("Number of interactions - ", names(cellchat_list)[i]))
+}
+# 关闭图形设备
+dev.off()
+
+
+#在二维空间中比较主要源和目标
+object.list <- cellchat_list
+num.link <- sapply(object.list, function(x) {rowSums(x@net$count) + colSums(x@net$count)-diag(x@net$count)})
+weight.MinMax <- c(min(num.link), max(num.link)) # control the dot size in the different datasets
+gg <- list()
+for (i in 1:length(object.list)) {
+  gg[[i]] <- netAnalysis_signalingRole_scatter(object.list[[i]], title = names(object.list)[i], weight.MinMax = weight.MinMax)
+}
+#> Signaling role analysis on the aggregated cell-cell communication network from all signaling pathways
+#> Signaling role analysis on the aggregated cell-cell communication network from all signaling pathways
+patchwork::wrap_plots(plots = gg)
+##warning!! The RStudio Plots window may be too small to show this patchwork.
+#ℹ Please make the window larger.
+#常见问题，解决方案1：RStudio Settings Adjustment: Go to Tools > Global Options > Pane Layout and adjust the settings for the plot output to use an external window.
+#方案2：
+# This will force the plot to show in an external window
+quartz()  # for macOS, or X11() for Linux, windows() for Windows
+patchwork::wrap_plots(plots = gg)
+#方案3. Save the Plot as a File
+ggsave("combined_plots.pdf", patchwork::wrap_plots(plots = gg), width = 11, height = 8.5)
+#方案4.# Try using the plot function directly
+plot(patchwork::wrap_plots(plots = gg))
+#从散点图中我们可以看出，Monocytes,Neutrophils和Macrophage成为D5中的主要来源和靶点之一。
+
+#B.识别特定细胞群的信号变化，识别样本之间Monocytes,Neutrophils和Macrophage的具体信号变化。
+# 生成 Monocytes 的信号变化散点图
+gg_monocytes <- netAnalysis_signalingChanges_scatter(
+  cellchat,
+  idents.use = "Monocytes",
+  signaling.exclude = c("MIF")  # 根据需要排除特定信号
+)
+
+# 生成 Neutrophils 的信号变化散点图
+gg_neutrophils <- netAnalysis_signalingChanges_scatter(
+  cellchat,
+  idents.use = "Neutrophils",
+  signaling.exclude = c("MIF")  # 根据需要排除特定信号
+)
+
+# 生成 Macrophage 的信号变化散点图
+gg_macrophage <- netAnalysis_signalingChanges_scatter(
+  cellchat,
+  idents.use = "Macrophage",
+  signaling.exclude = c("MIF")  # 根据需要排除特定信号
+)
+
+# 使用 patchwork 组合所有图形
+combined_plots <- patchwork::wrap_plots(plots = list(gg_monocytes, gg_neutrophils, gg_macrophage))
+print(combined_plots)
+ggsave("combined_plots_.pdf", plot = combined_plots, width = 20, height = 5)
+ggsave("gg_macrophage.pdf", plot = gg_macrophage, width = 20, height = 15)
+ggsave("gg_neutrophils.pdf", plot = gg_neutrophils, width = 20, height = 15)
+ggsave("gg_monocytes.pdf", plot = gg_monocytes, width = 20, height = 15)
+
+
+gg1 <- netAnalysis_signalingChanges_scatter(cellchat, idents.use = "Macrophage", signaling.exclude = "MIF")
+#> Visualizing differential outgoing and incoming signaling changes from NL to LS
+#> The following `from` values were not present in `x`: 0
+#> The following `from` values were not present in `x`: 0, -1
+gg2 <- netAnalysis_signalingChanges_scatter(cellchat, idents.use = "Neutrophils", signaling.exclude = c("MIF"))
+#> Visualizing differential outgoing and incoming signaling changes from NL to LS
+#> The following `from` values were not present in `x`: 0, 2
+#> The following `from` values were not present in `x`: 0, -1
+gg3 <- netAnalysis_signalingChanges_scatter(cellchat, idents.use = "Monocytes", signaling.exclude = c("MIF"))
+gg4 <- netAnalysis_signalingChanges_scatter(cellchat, idents.use = "T_cells", signaling.exclude = "MIF")
+ggsave("gg4_.pdf", plot = gg4, width = 20, height = 15)
+gg5 <- netAnalysis_signalingChanges_scatter(cellchat, idents.use = "pDCs", signaling.exclude = "MIF")
+ggsave("gg5_.pdf", plot = gg5, width = 20, height = 15)
+gg6 <- netAnalysis_signalingChanges_scatter(cellchat, idents.use = "NK", signaling.exclude = "MIF")
+ggsave("gg6_.pdf", plot = gg6, width = 20, height = 15)
+patchwork::wrap_plots(plots = list(gg4,gg5,gg6)) 
+# 使用 patchwork 组合所有图形
+combined_plots1 <- patchwork::wrap_plots(plots = list(gg4,gg5,gg6))
+print(combined_plots1)
+ggsave("combined_plots1_.pdf", plot = combined_plots1, width = 20, height = 5)
+
+
+```
+
+
+
+```
+```第二部分：识别具有不同网络架构和相互作用强度的改变信号
+
+#根据功能相似性识别信号组
+ptm = Sys.time()
+
+cellchat <- computeNetSimilarityPairwise(cellchat, type = "functional")
+#> Compute signaling network similarity for datasets 1 2
+cellchat <- netEmbedding(cellchat, type = "functional")
+#> Manifold learning of the signaling networks for datasets 1 2
+cellchat <- netClustering(cellchat, type = "functional")
+#> Classification learning of the signaling networks for datasets 1 2
+# Visualization in 2D-space
+netVisual_embeddingPairwise(cellchat, type = "functional", label.size = 3.5)
+#> 2D visualization of signaling networks from datasets 1 2
+#netVisual_embeddingZoomIn(cellchat, type = "functional", nCol = 2)
+
+#根据结构相似性识别信号组
+cellchat <- computeNetSimilarityPairwise(cellchat, type = "structural")
+cellchat <- netEmbedding(cellchat, type = "structural")
+cellchat <- netClustering(cellchat, type = "structural")
+# Visualization in 2D-space
+netVisual_embeddingPairwise(cellchat, type = "structural", label.size = 3.5)
+netVisual_embeddingPairwiseZoomIn(cellchat, type = "structural", nCol = 2)
+
+#计算并可视化学习到的联合流形中的路径距离
+rankSimilarity(cellchat, type = "functional")
+#> Compute the distance of signaling networks between datasets 1 2
+
+#识别具有不同相互作用强度的改变信号,比较各信号通路或配体-受体对的总体信息流
+gg1 <- rankNet(cellchat, mode = "comparison", measure = "weight", sources.use = NULL, targets.use = NULL, stacked = T, do.stat = TRUE)
+gg2 <- rankNet(cellchat, mode = "comparison", measure = "weight", sources.use = NULL, targets.use = NULL, stacked = F, do.stat = TRUE)
+gg1 + gg2
+
+gg1 <- rankNet(cellchat, mode = "comparison", measure = "weight", sources.use = NULL, targets.use = NULL, stacked = T, do.stat = TRUE,comparison = c(1,2,3))
+gg2 <- rankNet(cellchat, mode = "comparison", measure = "weight", sources.use = NULL, targets.use = NULL, stacked = F, do.stat = TRUE,comparison = c(1,2,3))
+gg1 + gg2
+combined_plot <- gg1 + gg2
+pdf("overall information flow_plots.pdf", width = 10, height = 7)
+print(combined_plot)
+dev.off()
+#The text on the y-axis will not be colored for the number of compared datasets larger than 3!
+```
+
+
+```B）比较与每个细胞群相关的传出（或传入）信号模式
+library(ComplexHeatmap)
+i = 1
+pathway.union <- union(object.list[[i]]@netP$pathways, object.list[[i+1]]@netP$pathways)
+ht1 <- netAnalysis_signalingRole_heatmap(object.list[[i]], pattern = "outgoing", signaling = pathway.union, title = names(object.list)[i], width = 7, height = 10)
+ht2 <- netAnalysis_signalingRole_heatmap(object.list[[i+1]], pattern = "outgoing", signaling = pathway.union, title = names(object.list)[i+1], width = 7, height = 10)
+ht3 <- netAnalysis_signalingRole_heatmap(object.list[[i+2]], pattern = "outgoing", signaling = pathway.union, title = names(object.list)[i+2], width = 7, height = 10)
+
+draw(ht1 + ht2 + ht3, ht_gap = unit(0.5, "cm"))
+execution.time = Sys.time() - ptm
+print(as.numeric(execution.time, units = "secs"))
+#> [1] 17.62665
+
+combined_plot <- ht1 + ht2 + ht3
+pdf("outgoing signaling_plots.pdf", width = 20, height = 8)
+print(combined_plot)
+dev.off()
+
+
+i=1
+ht4 = netAnalysis_signalingRole_heatmap(object.list[[i]], pattern = "incoming", signaling = pathway.union, title = names(object.list)[i], width = 5, height = 6, color.heatmap = "GnBu")
+ht5 = netAnalysis_signalingRole_heatmap(object.list[[i+1]], pattern = "incoming", signaling = pathway.union, title = names(object.list)[i+1], width = 5, height = 6, color.heatmap = "GnBu")
+ht6 = netAnalysis_signalingRole_heatmap(object.list[[i+1]], pattern = "incoming", signaling = pathway.union, title = names(object.list)[i+1], width = 5, height = 6, color.heatmap = "GnBu")
+draw(ht4 + ht5 + ht6, ht_gap = unit(0.5, "cm"))
+
+ht1 = netAnalysis_signalingRole_heatmap(object.list[[i]], pattern = "all", signaling = pathway.union, title = names(object.list)[i], width = 5, height = 6, color.heatmap = "OrRd")
+ht2 = netAnalysis_signalingRole_heatmap(object.list[[i+1]], pattern = "all", signaling = pathway.union, title = names(object.list)[i+1], width = 5, height = 6, color.heatmap = "OrRd")
+draw(ht1 + ht2, ht_gap = unit(0.5, "cm"))
+
+#通过比较通信概率来识别功能失调的信号
+ptm = Sys.time()
+p<- netVisual_bubble(cellchat, 
+                 sources.use = c("Neutrophils","Macrophage","Monocytes"), 
+                 targets.use = c("Monocytes","T_cells","Macrophage","Neutrophils","pDCs","cDC1s",     "NK","Basophil","B_cells","MigDC" ),
+                 comparison = c(1, 2, 3),
+                 angle.x = 45)
+ggsave("netVisual_bubble_plots.pdf", plot = p, width = 20, height = 15)
+
+p2 <- netVisual_bubble(cellchat, sources.use = 11, targets.use = c(1,2,3,5,6,7,8,9,10),  comparison = c(1, 2, 3), angle.x = 45)
+#> Comparing communications on a merged object
+ggsave("netVisual_bubble_plots_T.pdf", plot = p2, width = 6, height = 5)
+
+#此外，CellChat 可以识别一个数据集中与另一个数据集相比上调（增加）和下调（减少）的信号配体-受体对。这可以通过 在函数中 指定max.dataset和来实现。信号增加意味着这些信号在第二个数据集中的通信概率（强度）高于第一个数据集。气泡图中显示的配体-受体对可以通过访问。min.datasetnetVisual_bubblegg1$data
+gg1 <- netVisual_bubble(cellchat, sources.use = 11, targets.use = c(1,2,3,5,6,7,8,9,10),  comparison = c(2,1), max.dataset = 2, title.name = "Increased signaling in D5", angle.x = 45, remove.isolate = T)
+#> Comparing communications on a merged object
+gg2 <- netVisual_bubble(cellchat, sources.use = 11, targets.use = c(1,2,3,5,6,7,8,9,10),  comparison = c(2,1), max.dataset = 1, title.name = "Decreased signaling in D5", angle.x = 45, remove.isolate = T)
+#> Comparing communications on a merged object
+gg1 + gg2
+combined_plot <- gg1 + gg2
+pdf("netVisual_bubble_T_plots.pdf", width = 10, height = 7)
+print(combined_plot)
+dev.off()
+
+#利用差异表达分析识别功能失调的信号
+pos.dataset = "CART_D5"
+features.name = paste0(pos.dataset, ".merged")
+cellchat <- identifyOverExpressedGenes(cellchat, group.dataset = "datasets", pos.dataset = pos.dataset, features.name = features.name, only.pos = FALSE, thresh.pc = 0.1, thresh.fc = 0.05,thresh.p = 0.05, group.DE.combined = FALSE) 
+net <- netMappingDEG(cellchat, features.name = features.name, variable.all = TRUE)
+net.up <- subsetCommunication(cellchat, net = net, datasets = "CART_D5",ligand.logFC = 0.05, receptor.logFC = NULL)
+net.down <- subsetCommunication(cellchat, net = net, datasets = "CART_D14",ligand.logFC = -0.05, receptor.logFC = NULL)
+gene.up <- extractGeneSubsetFromPair(net.up, cellchat)
+gene.down <- extractGeneSubsetFromPair(net.down, cellchat)
+
+pairLR.use.up = net.up[, "interaction_name", drop = F]
+gg1 <- netVisual_bubble(cellchat, pairLR.use = pairLR.use.up, sources.use = 11, targets.use = c(1,2,3,5,6,7,8,9,10), comparison = c(2,1),  angle.x = 90, remove.isolate = T,title.name = paste0("Up-regulated signaling in ", names(object.list)[1]))
+#> Comparing communications on a merged object
+pairLR.use.down = net.down[, "interaction_name", drop = F]
+gg2 <- netVisual_bubble(cellchat, pairLR.use = pairLR.use.down, sources.use = 11, targets.use = c(1,2,3,5,6,7,8,9,10), comparison = c(2,1),  angle.x = 90, remove.isolate = T,title.name = paste0("Down-regulated signaling in ", names(object.list)[1]))
+#> Comparing communications on a merged object
+gg1 + gg2
+combined_plot <- gg1 + gg2
+pdf("up down ligand-receptor pairs_T_plots.pdf", width = 10, height = 7)
+print(combined_plot)
+dev.off()
+
