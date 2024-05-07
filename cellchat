@@ -1,1 +1,58 @@
+install.packages('ggalluvial')
+#Installation of other dependencies
+install.packages('NMF')
+devtools::install_github("jokergoo/circlize")
+devtools::install_github("jokergoo/ComplexHeatmap")
+devtools::install_github('immunogenomics/presto')
 
+#Installation of cellchat
+devtools::install_github("jinworks/CellChat")
+
+library(CellChat)
+library(ggalluvial)
+library(Seurat)
+
+#加载已经经过细胞注释的Seurat对象
+CART_
+##提取表达矩阵和细胞类别创建cellchat对象
+data.input <- GetAssayData(CART_combined_new, assay = "RNA", slot = "data")
+identity <- subset(CART_combined_new@meta.data, select = "celltype")
+cellchat <- createCellChat(object = CART_combined_new, meta = identity,  group.by = "celltype")
+#导入配受体数据库（人或者鼠）
+#CellChatDB <- CellChatDB.human
+CellChatDB <- CellChatDB.mouse
+#查看可以选择的侧面（选择特定的信息描述细胞间的作用）
+unique(CellChatDB$interaction$annotation)
+# "Secreted Signaling" ，"ECM-Receptor"， "Cell-Cell Contact" 三种可选
+CellChatDB.use <- subsetDB(CellChatDB, search = "Secreted Signaling")
+cellchat@DB <- CellChatDB.use
+#对数据进行子集化，节省计算成本
+cellchat <- subsetData(cellchat)
+# 识别过表达基因
+cellchat <- identifyOverExpressedGenes(cellchat)
+# 识别配体-受体对
+cellchat <- identifyOverExpressedInteractions(cellchat)
+# 将配体、受体投射到PPI网络
+cellchat <- projectData(cellchat, PPI.mouse)
+#计算通信概率推断细胞互作的通信网络
+
+cellchat <- computeCommunProb(cellchat, raw.use = TRUE)
+#过滤掉低质量的细胞间的通信
+cellchat <- filterCommunication(cellchat, min.cells = 3)
+
+#提取所有推断的配体/受体级别的细胞-细胞通信
+df.net <- subsetCommunication(cellchat)
+
+#在信号通路水平上推断细胞间的通讯
+cellchat <- computeCommunProbPathway(cellchat)
+##汇总细胞间的通讯
+cellchat <- aggregateNet(cellchat)
+
+#计算聚合细胞互作通信网络
+groupSize <- as.numeric(table(cellchat@idents))
+par(mfrow = c(1,2), xpd=TRUE)
+#互作的数量
+netVisual_circle(cellchat@net$count, vertex.weight = groupSize, weight.scale = T, label.edge= F, title.name = "Number of interactions")
+
+#互作的权重
+netVisual_circle(cellchat@net$weight, vertex.weight = groupSize, weight.scale = T, label.edge= F, title.name = "Interaction weights/strength")
