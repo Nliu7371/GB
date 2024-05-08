@@ -4,7 +4,9 @@ data.seurat <- CART_T
 
 library(ProjecTILs)
 ref <- load.reference.map()
-
+querydata <- CART_T
+querydata@meta.data[["orig.ident"]] <- factor(querydata@meta.data[["orig.ident"]], 
+                                              levels = c("CART_D5", "CART_D14", "CART_D21"))
 querydata_D5 <- subset(querydata, orig.ident=='CART_D5')
 querydata_D14 <- subset(querydata, orig.ident=='CART_D14')
 querydata_D21 <- subset(querydata, orig.ident=='CART_D21')
@@ -21,6 +23,16 @@ p_D14 <- DimPlot(querydata_D14, group.by = "functional.cluster", cols = palette)
 ggsave("querydata_D14 projected_umap.pdf",plot=p_D14, width=6,height=4)
 p_D21 <- DimPlot(querydata_D21, group.by = "functional.cluster", cols = palette)
 ggsave("querydata_D21 projected_umap.pdf",plot=p_D21, width=6,height=4)
+
+
+my36colors <-c('#E5D2DD', '#53A85F', '#F1BB72', '#F3B1A0', '#D6E7A3', '#57C3F3', '#476D87',
+               '#E95C59', '#E59CC4', '#AB3282', '#23452F', '#BD956A', '#8C549C', '#585658',
+               '#9FA3A8', '#E0D4CA', '#5F3D69', '#C5DEBA', '#58A4C3', '#E4C755', '#F7F398',
+               '#AA9A59', '#E63863', '#E39A35', '#C1E6F3', '#6778AE', '#91D0BE', '#B53E2B',
+               '#712820', '#DCC1DD', '#CCE0F5',  '#CCC9E6', '#625D9E', '#68A180', '#3A6963',
+               '#968175'
+)
+
 
 
 data.projected <- make.projection(data.seurat, ref=ref, filter.cells = F)
