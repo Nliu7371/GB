@@ -282,6 +282,589 @@ a + b + plot_layout(ncol = 1) & NoLegend()
 
 
 
+
+"KEGG_PYRUVATE_METABOLISM","REACTOME_MITOCHONDRIAL_BIOGENESIS",
+"KEGG_T_CELL_RECEPTOR_SIGNALING_PATHWAY","BIOCARTA_CTL_PATHWAY",
+"WP_TCELL_ANTIGEN_RECEPTOR_TCR_SIGNALING_PATHWAY","PID_TCR_PATHWAY"))
+signatures <- list("Cytotoxic"=c("Prf1","Gzma","Gzmb","Gzmc","Gzmf"),
+"Stemness"=c("Tcf7","Ccr7","Sell","Lef1","Il7r"),
+"Exhaustion"=c("Pdcd1","Lag3","Havcr2","Entpd1","Ctla4"),
+"TCR_signaling"=c("Cd69","Cd28","Nr4a1","Nr4a2","Nr4a3","Nfkb1","Nfkbia","Nfkbib"),
+"Cycling"=c(scGate::genes.blacklist.default$Mm$cellCycle.G1S, scGate::genes.blacklist.default$Mm$cellCycle.G2M))
+signatures_Carmona et al. <- list("Cytotoxic"=c("Prf1","Gzmb","Fasl"),
+signatures_Carmona_et_al <- list("Cytotoxic"=c("Prf1","Gzmb","Fasl"),
+#                   "Stemness"=c("Tcf7","Sell","Lef1","Il7r"),
+#                   "Exhaustion"=c("Pdcd1","Lag3","Havcr2","Tigit","Ctla4"),
+#                   "TCR_signaling"=c("Cd69","Cd28","Nr4a1","Nr4a2","Nr4a3","Nfkb1","Nfkbia","Nfkbib"),
+#                   "Cycling"=c(scGate::genes.blacklist.default$Mm$cellCycle.G1S, scGate::genes.blacklist.default$Mm$cellCycle.G2M))_
+signatures_Carmona_et_al <- list("Cytotoxic"=c("Prf1","Gzmb","Fasl"),
+#                   "Stemness"=c("Tcf7","Sell","Lef1","Il7r"),
+#                   "Exhaustion"=c("Pdcd1","Lag3","Havcr2","Tigit","Ctla4"),
+#                   "TCR_signaling"=c("Cd69","Cd28","Nr4a1","Nr4a2","Nr4a3","Nfkb1","Nfkbia","Nfkbib"),
+#                   "Cycling"=c(scGate::genes.blacklist.default$Mm$cellCycle.G1S, scGate::genes.blacklist.default$Mm$cellCycle.G2M))
+signatures_Carmona_et_al <- list("Cytotoxic"=c("Prf1","Gzmb","Fasl"),
+#                   "Stemness"=c("Tcf7","Sell","Lef1","Il7r"),
+#                   "Exhaustion"=c("Pdcd1","Lag3","Havcr2","Tigit","Ctla4"),
+#                   "TCR_signaling"=c("Cd69","Cd28","Nr4a1","Nr4a2","Nr4a3","Nfkb1","Nfkbia","Nfkbib"),
+#                   "Cycling"=c(scGate::genes.blacklist.default$Mm$cellCycle.G1S, scGate::genes.blacklist.default$Mm$cellCycle.G2M))
+signatures <- c(signatures, gene.sets.c2)
+to.add.query <- subset(data.seurat, subset=cluster %in% c('0','1'))
+rlang::last_trace()
+# Nebulosa plotting
+p <- plot_density(CART_T, c("TCF7", "IL7R", "SELL", "KLF2"), joint = T, )
+# Nebulosa plotting
+p <- plot_density(CART_T, c("Tcf7", "Il7r", "Sell", "Klf2"), joint = T, )
+p + plot_layout(ncol = 3)
+View(p)
+# Nebulosa plotting
+plot_density(CART_T, c("Tcf7", "Il7r", "Sell", "Klf2"), joint = T, )
+# Nebulosa plotting
+p <- plot_density(CART_T, c("Tcf7", "Il7r", "Sell", "Klf2"), joint = T, )
+View(p)
+# Nebulosa plotting
+p <- plot_density(CART_T, c("Tcf7", "Il7r", "Sell", "Klf2") )
+library(ReactomeGSA)
+if (!requireNamespace("BiocManager", quietly = TRUE))
+install.packages("BiocManager")
+BiocManager::install("ReactomeGSA")
+library(ReactomeGSA)
+p[[1]]
+p[[2]]
+p[[3]]
+p[[4]]
+df <- as.data.frame(Embeddings(object = CART_T, reduction = "umap"))
+View(df)
+View(CART_T)
+df <- cbind(df, CART_T$orig.ident
+df <- cbind(df, CART_T$orig.ident)
+View(df)
+colnames(df) <- c("UMAP_1", "UMAP_2", "orig.ident")
+df$orig.ident <- factor(x = df$orig.ident, levels = c("CART_D5", "CART_D14","CART_D21"))
+a <- plot(ggplot(data = df) +
+geom_point(data = df, aes(x = UMAP_1, y = UMAP_2), color = "lightgrey", size = 0.5) +
+stat_density_2d(aes(x = UMAP_1, y = UMAP_2, fill = after_stat(level), alpha = (..level..)), bins = 20, geom = "polygon") +
+theme_classic() +
+xlim(c(-9, 11)) +
+ylim(c(-7, 8)) +
+scale_fill_viridis_c(option = "plasma") +
+facet_grid(. ~ genotype, labeller = labeller(genotype = labels)) +
+theme(
+strip.text.x = element_text(
+size = 20, color = "black",
+face = "bold"
+),
+strip.text.y = element_text(
+size = 20, color = "black",
+face = "bold"
+)
+))
+a <- plot(ggplot(data = df) +
+geom_point(data = df, aes(x = UMAP_1, y = UMAP_2), color = "lightgrey", size = 0.5) +
+stat_density_2d(aes(x = UMAP_1, y = UMAP_2, fill = after_stat(level), alpha = (..level..)), bins = 20, geom = "polygon") +
+theme_classic() +
+xlim(c(-9, 11)) +
+ylim(c(-7, 8)) +
+scale_fill_viridis_c(option = "plasma") +
+facet_grid(. ~ orig.ident, labeller = labeller(orig.ident = labels)) +
+theme(
+strip.text.x = element_text(
+size = 20, color = "black",
+face = "bold"
+),
+strip.text.y = element_text(
+size = 20, color = "black",
+face = "bold"
+)
+))
+a <- plot(ggplot(data = df) +
+geom_point(data = df, aes(x = UMAP_1, y = UMAP_2), color = "lightgrey", size = 0.5) +
+stat_density_2d(aes(x = UMAP_1, y = UMAP_2, fill = after_stat(level), alpha = after_stat(level))), bins = 20, geom = "polygon") +
+theme_classic() +
+xlim(c(-9, 11)) +
+ylim(c(-7, 8)) +
+scale_fill_viridis_c(option = "plasma") +
+facet_grid(. ~ orig.ident, labeller = labeller(orig.ident = labels)) +
+theme(
+strip.text.x = element_text(
+size = 20, color = "black",
+face = "bold"
+),
+strip.text.y = element_text(
+size = 20, color = "black",
+face = "bold"
+)
+))
+a <- plot(ggplot(data = df) +
+geom_point(data = df, aes(x = UMAP_1, y = UMAP_2), color = "lightgrey", size = 0.5) +
+stat_density_2d(aes(x = UMAP_1, y = UMAP_2, fill = after_stat(level), alpha = after_stat(level))), bins = 20, geom = "polygon") +
+theme_classic() +
+xlim(c(-9, 11)) +
+ylim(c(-7, 8)) +
+scale_fill_viridis_c(option = "plasma") +
+facet_grid(. ~ orig.ident, labeller = labeller(orig.ident = labels)) +
+theme(
+strip.text.x = element_text(
+size = 20, color = "black",
+face = "bold"
+),
+strip.text.y = element_text(
+size = 20, color = "black",
+face = "bold"
+)
+)
+a <- plot(ggplot(data = df) +
+geom_point(data = df, aes(x = UMAP_1, y = UMAP_2), color = "lightgrey", size = 0.5) +
+stat_density_2d(aes(x = UMAP_1, y = UMAP_2, fill = after_stat(level), alpha = (..level..)), bins = 20, geom = "polygon") +
+theme_classic() +
+#xlim(c(-9, 11)) +
+#ylim(c(-7, 8)) +
+scale_fill_viridis_c(option = "plasma") +
+facet_grid(. ~ orig.ident, labeller = labeller(orig.ident = labels)) +
+theme(
+strip.text.x = element_text(
+size = 20, color = "black",
+face = "bold"
+),
+strip.text.y = element_text(
+size = 20, color = "black",
+face = "bold"
+)
+))
+a <- plot(ggplot(data = df) +
+geom_point(data = df, aes(x = UMAP_1, y = UMAP_2), color = "lightgrey", size = 0.5) +
+stat_density_2d(aes(x = UMAP_1, y = UMAP_2, fill = after_stat(level), alpha = (..level..)), bins = 20, geom = "polygon") +
+theme_classic() +
+xlim(c(-15, 10)) +
+ylim(c(-5, 15)) +
+scale_fill_viridis_c(option = "plasma") +
+facet_grid(. ~ orig.ident, labeller = labeller(orig.ident = labels)) +
+theme(
+strip.text.x = element_text(
+size = 20, color = "black",
+face = "bold"
+),
+strip.text.y = element_text(
+size = 20, color = "black",
+face = "bold"
+)
+))
+a <- plot(ggplot(data = df) +
+geom_point(data = df, aes(x = UMAP_1, y = UMAP_2), color = "lightgrey", size = 0.5) +
+stat_density_2d(aes(x = UMAP_1, y = UMAP_2, fill = after_stat(level), alpha = (..level..)), bins = 20, geom = "polygon") +
+theme_classic() +
+xlim(c(-15, 15)) +
+ylim(c(-10, 15)) +
+scale_fill_viridis_c(option = "plasma") +
+facet_grid(. ~ orig.ident, labeller = labeller(orig.ident = labels)) +
+theme(
+strip.text.x = element_text(
+size = 20, color = "black",
+face = "bold"
+),
+strip.text.y = element_text(
+size = 20, color = "black",
+face = "bold"
+)
+))
+ggsave("plots/projected_density_facet_ident.pdf",plot=p, width=15,height=8)
+ggsave("plots/projected_density_facet_ident.pdf",plot=a, width=15,height=8)
+View(a)
+ggsave("plots/projected_density_facet_ident.pdf",plot=a, width=15,height=8)
+ggsave("plots/projected_density_facet_ident.pdf",plot=a, width=8,height=4)
+View(df)
+a <- plot(ggplot(data = df) +
+geom_point(data = df, aes(x = UMAP_1, y = UMAP_2), color = "lightgrey", size = 0.5) +
+stat_density_2d(aes(x = UMAP_1, y = UMAP_2, fill = after_stat(level), alpha = (..level..)), bins = 20, geom = "polygon") +
+theme_classic() +
+xlim(c(-15, 12)) +
+ylim(c(-7, 15)) +
+scale_fill_viridis_c(option = "plasma") +
+facet_grid(. ~ orig.ident, labeller = labeller(orig.ident = labels)) +
+theme(
+strip.text.x = element_text(
+size = 20, color = "black",
+face = "bold"
+),
+strip.text.y = element_text(
+size = 20, color = "black",
+face = "bold"
+)
+))
+labels <- c("CART_D5", "CART_D14","CART_D21")
+a <- plot(ggplot(data = df) +
+geom_point(data = df, aes(x = UMAP_1, y = UMAP_2), color = "lightgrey", size = 0.5) +
+stat_density_2d(aes(x = UMAP_1, y = UMAP_2, fill = after_stat(level), alpha = (..level..)), bins = 20, geom = "polygon") +
+theme_classic() +
+xlim(c(-15, 12)) +
+ylim(c(-7, 15)) +
+scale_fill_viridis_c(option = "plasma") +
+facet_grid(. ~ orig.ident, labeller = labeller(orig.ident = labels)) +
+theme(
+strip.text.x = element_text(
+size = 20, color = "black",
+face = "bold"
+),
+strip.text.y = element_text(
+size = 20, color = "black",
+face = "bold"
+)
+))
+ggsave("plots/projected_density_facet_ident.pdf",plot=a, width=6,height=4)
+ggsave("plots/projected_density_facet_ident.pdf",plot=a, width=9,height=3)
+labels <- c("D5 - 3153 cells", "D14 - 3013","D21 - 3184")
+a <- plot(ggplot(data = df) +
+geom_point(data = df, aes(x = UMAP_1, y = UMAP_2), color = "lightgrey", size = 0.5) +
+stat_density_2d(aes(x = UMAP_1, y = UMAP_2, fill = after_stat(level), alpha = (..level..)), bins = 20, geom = "polygon") +
+theme_classic() +
+xlim(c(-15, 12)) +
+ylim(c(-7, 15)) +
+scale_fill_viridis_c(option = "plasma") +
+facet_grid(. ~ orig.ident, labeller = labeller(orig.ident = labels)) +
+theme(
+strip.text.x = element_text(
+size = 20, color = "black",
+face = "bold"
+),
+strip.text.y = element_text(
+size = 20, color = "black",
+face = "bold"
+)
+))
+View(melt)
+a <- plot(ggplot(data = df) +
+geom_point(data = df, aes(x = UMAP_1, y = UMAP_2), color = "lightgrey", size = 0.5) +
+stat_density_2d(aes(x = UMAP_1, y = UMAP_2, fill = after_stat(level), alpha = (..level..)), bins = 20, geom = "polygon") +
+theme_classic() +
+xlim(c(-15, 12)) +
+ylim(c(-7, 15)) +
+scale_fill_viridis_c(option = "plasma") +
+facet_grid(. ~ orig.ident, labeller = labeller(orig.ident = labels)) +
+theme(
+strip.text.x = element_text(
+size = 20, color = "black",
+face = "bold"
+),
+strip.text.y = element_text(
+size = 20, color = "black",
+face = "bold"
+)
+))
+df.a <- as.data.frame(Embeddings(object = CART_T, reduction = "tsne"))
+View(CART_T)
+View(CART_T)
+View(CART_T)
+View(gene.sets.c2)
+View(df.a)
+View(df.a)
+View(df.a)
+View(gene.sets.c2)
+df.a <- cbind(df.a, CART_T$orig.ident)
+colnames(df.a) <- c("UMAP_1", "UMAP_2", "orig.ident")
+df.a$orig.ident <- factor(x = df$orig.ident, levels = c("CART_D5", "CART_D14","CART_D21"))
+labels <- c("D5 - 3153 cells", "D14 - 3013 cells","D21 - 3184 cells")
+names(labels) <- c("CART_D5", "CART_D14","CART_D21")
+colnames(df.a) <- c("TSNE_1", "TSNE_2", "orig.ident)
+colnames(df.a) <- c("TSNE_1", "TSNE_2", "orig.ident")
+b <- plot(ggplot(data = df.a) +
+geom_point(data = df.a, aes(x = TSNE_1, y = TSNE_2), color = "lightgrey", size = 0.5) +
+stat_density_2d(aes(x = TSNE_1, y = TSNE_2, fill = after_stat(level), alpha = (..level..)), bins = 20, geom = "polygon") +
+theme_classic() +
+xlim(c(-50, 50)) +
+ylim(c(-50, 60)) +
+scale_fill_viridis_c(option = "plasma") +
+facet_grid(. ~ orig.ident, labeller = labeller(orig.ident = labels)) +
+theme(
+strip.text.x = element_text(
+size = 20, color = "black",
+face = "bold"
+),
+strip.text.y = element_text(
+size = 20, color = "black",
+face = "bold"
+)
+))
+ggsave("plots/projected_density_facet_ident_TSNE.pdf",plot=b, width=9,height=3)
+b <- plot(ggplot(data = df.a) +
+geom_point(data = df.a, aes(x = TSNE_1, y = TSNE_2), color = "lightgrey", size = 0.5) +
+stat_density_2d(aes(x = TSNE_1, y = TSNE_2, fill = after_stat(level), alpha = (..level..)), bins = 20, geom = "polygon") +
+theme_classic() +
+xlim(c(-50,55)) +
+ylim(c(-50, 50)) +
+scale_fill_viridis_c(option = "plasma") +
+facet_grid(. ~ orig.ident, labeller = labeller(orig.ident = labels)) +
+theme(
+strip.text.x = element_text(
+size = 20, color = "black",
+face = "bold"
+),
+strip.text.y = element_text(
+size = 20, color = "black",
+face = "bold"
+)
+))
+b <- plot(ggplot(data = df.a) +
+geom_point(data = df.a, aes(x = TSNE_1, y = TSNE_2), color = "lightgrey", size = 0.5) +
+stat_density_2d(aes(x = TSNE_1, y = TSNE_2, fill = after_stat(level), alpha = (..level..)), bins = 20, geom = "polygon") +
+theme_classic() +
+xlim(c(-50,55)) +
+ylim(c(-55, 55)) +
+scale_fill_viridis_c(option = "plasma") +
+facet_grid(. ~ orig.ident, labeller = labeller(orig.ident = labels)) +
+theme(
+strip.text.x = element_text(
+size = 20, color = "black",
+face = "bold"
+),
+strip.text.y = element_text(
+size = 20, color = "black",
+face = "bold"
+)
+))
+ggsave("plots/projected_density_facet_ident_TSNE.pdf",plot=b, width=8,height=3)
+b <- plot(ggplot(data = df.a) +
+geom_point(data = df.a, aes(x = TSNE_1, y = TSNE_2), color = "lightgrey", size = 0.5) +
+stat_density_2d(aes(x = TSNE_1, y = TSNE_2, fill = after_stat(level), alpha = (..level..)), bins = 20, geom = "polygon") +
+theme_classic() +
+xlim(c(-50,55)) +
+ylim(c(-55, 55)) +
+scale_fill_viridis_c(option = "plasma") +
+facet_grid(. ~ orig.ident, labeller = labeller(orig.ident = labels)) +
+theme(
+strip.text.x = element_text(
+size = 14, color = "black"
+),
+strip.text.y = element_text(
+size = 14, color = "black"
+)
+))
+ggsave("plots/projected_density_facet_ident_TSNE.pdf",plot=b, width=8,height=3)
+a <- plot(ggplot(data = df) +
+geom_point(data = df, aes(x = UMAP_1, y = UMAP_2), color = "lightgrey", size = 0.5) +
+stat_density_2d(aes(x = UMAP_1, y = UMAP_2, fill = after_stat(level), alpha = (..level..)), bins = 20, geom = "polygon") +
+theme_classic() +
+xlim(c(-15, 12)) +
+ylim(c(-7, 15)) +
+scale_fill_viridis_c(option = "plasma") +
+facet_grid(. ~ orig.ident, labeller = labeller(orig.ident = labels)) +
+theme(
+strip.text.x = element_text(
+size = 14, color = "black"
+),
+strip.text.y = element_text(
+size = 14, color = "black"
+)
+))
+ggsave("plots/projected_density_facet_ident_UMAP.pdf",plot=a, width=8,height=3)
+savehistory("J:/10x sc-RNA seq/20240427.Rhistory")
+
+# Cell cycle scoring
+CART_T.cellcycle <- CellCycleScoring(CART_T,
+g2m.features = cc.genes$g2m.genes,
+s.features = cc.genes$s.genes, set.ident = F
+)
+DimPlot(CART_T.cellcycle, group.by = "Phase", label = T, label.size = 6, pt.size = 1.1)
+
+# Nebulosa plotting
+p <- plot_density(CART_T.cellcycle, c("TCF7", "IL7R", "SELL", "KLF2"), joint = T)
+require("biomaRt")
+if (!require("BiocManager", quietly = TRUE))
+install.packages("BiocManager")
+BiocManager::install("biomaRt")
+require("biomaRt")
+m.s.genes <- convertHumanGeneList(cc.genes.updated.2019$s.genes)
+savehistory("J:/10x sc-RNA seq/20240427.Rhistory")
+
+# ReactomeGSA
+library(ReactomeGSA)
+gsva_result <- analyse_sc_clusters(CART_T, verbose = TRUE)
+plot_gsva_heatmap(gsva_result, max_pathways = 20, margins = c(6, 25))
+View(gsva_result)
+# ReactomeGSA
+library(ReactomeGSA)
+gsva_result <- analyse_sc_clusters(CART_T, verbose = TRUE)
+#The resulting object is a standard ReactomeAnalysisResult object.
+gsva_result
+pathway_expression <- pathways(gsva_result)
+
+# simplify the column names by removing the default dataset identifier
+colnames(pathway_expression) <- gsub("\\.Seurat", "", colnames(pathway_expression))
+
+pathway_expression[1:3,]
+
+# find the maximum differently expressed pathway
+max_difference <- do.call(rbind, apply(pathway_expression, 1, function(row) {
+    values <- as.numeric(row[2:length(row)])
+    return(data.frame(name = row[1], min = min(values), max = max(values)))
+}))
+
+max_difference$diff <- max_difference$max - max_difference$min
+
+# sort based on the difference
+max_difference <- max_difference[order(max_difference$diff, decreasing = T), ]
+
+head(max_difference)
+# Additional parameters are directly passed to gplots heatmap.2 function
+plot_gsva_heatmap(gsva_result, max_pathways = 15, margins = c(6,20))
+
+plot_gsva_heatmap(gsva_result, max_pathways = 50)
+
+# limit to selected B cell related pathways
+relevant_pathways <- c("R-HSA-983170", "R-HSA-388841", "R-HSA-2132295", "R-HSA-983705", "R-HSA-5690714")
+plot_gsva_heatmap(gsva_result, 
+                  pathway_ids = relevant_pathways, # limit to these pathways
+                  margins = c(6,30), # adapt the figure margins in heatmap.2
+                  dendrogram = "col", # only plot column dendrogram
+                  scale = "row", # scale for each pathway
+                  key = FALSE, # don't display the color key
+                  lwid=c(0.1,4)) # remove the white space on the left
+
+gsva_result@results[["Seurat"]][["pathways"]]
+plot_gsva_heatmap(gsva_result, max_pathways = 20, margins = c(0, 20))
+plot_gsva_heatmap(gsva_result, max_pathways = 20, margins = c(6, 25))
+plot_gsva_heatmap(gsva_result, max_pathways = 20)
+View(Hs2Mm.convert.table)
+View(gsva_result)
+gsva_result@results
+View(gsva_result)
+head(gsva_result@results$Seurat$fold_changes)
+pathway_expression <- pathways(gsva_result)
+View(pathway_expression)
+max_difference <- do.call(rbind, apply(pathway_expression, 1, function(row) {
++   values <- as.numeric(row[2:length(row)])
++   return(data.frame(name = row[1], min = min(values), max = max(values)))
++ }))
+max_difference <- do.call(rbind, apply(pathway_expression, 1, function(row) {
+values <- as.numeric(row[2:length(row)])
+return(data.frame(name = row[1], min = min(values), max = max(values)))
+}))
+max_difference$diff <- max_difference$max - max_difference$min
+# sort based on the difference
+max_difference <- max_difference[order(max_difference$diff, decreasing = T), ] head(max_difference)
+max_difference <- do.call(rbind, apply(pathway_expression, 1, function(row) {
+values <- as.numeric(row[2:length(row)])
+return(data.frame(name = row[1], min = min(values), max = max(values)))
+}))
+max_difference$diff <- max_difference$max - max_difference$min
+# sort based on the difference
+max_difference <- max_difference[order(max_difference$diff, decreasing = T)] head(max_difference)
+max_difference <- do.call(rbind, apply(pathway_expression, 1, function(row) {
+values <- as.numeric(row[2:length(row)])
+return(data.frame(name = row[1], min = min(values), max = max(values)))
+}))
+max_difference$diff <- max_difference$max - max_difference$min
+# sort based on the difference
+max_difference <- max_difference[order(max_difference$diff, decreasing = T), ]
+head(max_difference)
+View(max_difference)
+savehistory("J:/10x sc-RNA seq/20240427.Rhistory")
+save.image("J:/10x sc-RNA seq/2024042.RData")
+if (!requireNamespace("remotes")) install.packages("remotes")
+library(remotes)
+remotes::install_github("carmonalab/STACAS")
+library(STACAS)
+library(SeuratData)
+devtools::install_github('satijalab/seurat-data')
+remotes::install_github('satijalab/seurat-wrappers')
+library(scGate)
+my.genes.blocklist <- scGate::genes.blacklist.default$Mm
+CD8T <- scGate::gating_model(name="CD8T", signature=c("Cd8a","Cd8b1"))
+CD4T <- scGate::gating_model(name="CD4T", signature=c("Cd4","Cd40lg"))
+models <- list("CD8T"=CD8T, "CD4T"=CD4T)
+models
+obj.list <- lapply(obj.list, function(x) {
+scGate(x, model=models, multi.asNA=TRUE)
+})
+install.packages("scCustomize")
+library(scCustomize)
+library(tidyverse)
+library(patchwork)
+library(viridis)
+library(Seurat)
+library(Nebulosa)
+
+# Plot volcano KO vs WT in batch for each cluster
+library(EnhancedVolcano)
+CART_T <- NormalizeData(CART_T) %>%
+FindVariableFeatures() %>%
+ScaleData()
+Idents(CART_T) <- paste(CART_T$RNA_snn_res.1, CART_T$orig.ident)
+pdf("volcano_bycluster_orig.ident.pdf", width = 9, height = 9)
+for (i in levels(Idents(CART_T))) {
+degs <- try(FindMarkers(object = CART_T, ident.1 = c("CART_D5"), ident.2 = c("CART_D14"), subset.ident = i, assay = "RNA"))
+try(plot(EnhancedVolcano(degs,
+lab = rownames(degs),
+x = "avg_log2FC",
+y = "p_val_adj",
+drawConnectors = T,
+pCutoff = 0.001,
+FCcutoff = 0.3
+) + ggtitle(paste("cluster", i, sep = " "))))
+}
+dev.off()
+
+View(CART_T)
+View(data.seurat)
+Idents(CART_T) <- paste(CART_T$RNA_snn_res.1, CART_T$orig.ident)
+pdf("volcano_bycluster_orig.ident.pdf", width = 9, height = 9)
+for (i in levels(Idents(CART_T))) {
+degs <- try(FindMarkers(object = CART_T, ident.1 = "CART_D5", ident.2 = "CART_D14", subset.ident = i,group.by = "orig.ident", assay = "RNA"))
+try(plot(EnhancedVolcano(degs,
+lab = rownames(degs),
+x = "avg_log2FC",
+y = "p_val_adj",
+drawConnectors = T,
+pCutoff = 0.001,
+FCcutoff = 0.3
+) + ggtitle(paste("cluster", i, sep = " "))))
+}
+dev.off()
+
+Idents(CART_T) <- paste(CART_T$RNA_snn_res.1, CART_T$orig.ident)
+pdf("volcano_bycluster_orig.ident.pdf", width = 9, height = 9)
+for (i in levels(Idents(CART_T))) {
+degs <- try(FindMarkers(object = CART_T, ident.1 = "CART_D5", subset.ident = i,group.by = "orig.ident", assay = "RNA"))
+try(plot(EnhancedVolcano(degs,
+lab = rownames(degs),
+x = "avg_log2FC",
+y = "p_val_adj",
+drawConnectors = T,
+pCutoff = 0.001,
+FCcutoff = 0.3
+) + ggtitle(paste("cluster", i, sep = " "))))
+}
+dev.off()
+savehistory("J:/10x sc-RNA seq/20240427.Rhistory")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ```
 #单个基因 Nebulosa
 genes <- c("BCL2","SATB1","ID3","KLRG1","ZNF683","ID2", "GNLY","GZMK","CX3CR1", "HAVCR2","ENTPD1","S1PR1","RBPJ","FOS","JUN","JUNB","CD69")
