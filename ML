@@ -275,3 +275,102 @@ trainCorrelation <- ggplot(train, aes(Outcome, Cor, fill = "white")) +
 print(trainCorrelation)
 ggsave("trainCorrelation.pdf", width = 2, height = 2.5)
 
+testCorrelation <- ggplot(test, aes(Outcome, Cor, fill = "white")) +
+    stat_boxplot(geom = "errorbar", width = 0.2, color = "black") +
+    geom_boxplot(size = 0.2, fill = "white", outlier.color = "white", outlier.fill = "white") +
+    geom_jitter(aes(color = Outcome, fill = Outcome), shape = 21, width = 0.25, size = 2) +
+    scale_fill_nejm() +
+    scale_color_nejm() +
+    geom_signif(comparisons = list(c("MP", "IM")), map_signif_level = TRUE, textsize = 2, test = "wilcox.test", step_increase = 0.2) +
+    guides(fill = "none") +
+    labs(x = "", y = "Pearson Correlation Coefficient") +
+    theme_bw() +
+    theme(
+        legend.position = "none",
+        axis.ticks = element_line(color = "black", size = 0.2),
+        panel.grid = element_blank(),
+        panel.border = element_rect(color = "white"),
+        axis.text.x = element_text(colour = "black", size = 12),
+        axis.text.y = element_text(colour = "black", size = 12),
+        axis.title.x = element_text(colour = "black", size = 12, face = "plain"),
+        axis.title.y = element_text(colour = "black", size = 12, face = "plain"),
+        axis.line = element_line(color = "black", size = 0.5)
+    )
+
+print(testCorrelation)
+ggsave("testCorrelation.pdf", width = 2, height = 2.5)
+
+testshardnum <- ggplot(test, aes(Outcome, shared, fill = "white")) +
+    stat_boxplot(geom = "errorbar", width = 0.2, color = "black") +
+    geom_boxplot(size = 0.2, fill = "white", outlier.color = "white", outlier.fill = "white") +
+    geom_jitter(aes(color = Outcome, fill = Outcome), shape = 21, width = 0.25, size = 2) +
+    scale_fill_nejm() +
+    scale_color_nejm() +
+    geom_signif(comparisons = list(c("MP", "IM")), map_signif_level = TRUE, textsize = 2, test = "wilcox.test", step_increase = 0.2) +
+    guides(fill = "none") +
+    labs(x = "", y = "shardnum") +
+    theme_bw() +
+    theme(
+        legend.position = "none",
+        axis.ticks = element_line(color = "black", size = 0.2),
+        panel.grid = element_blank(),
+        panel.border = element_rect(color = "white"),
+        axis.text.x = element_text(colour = "black", size = 12),
+        axis.text.y = element_text(colour = "black", size = 12),
+        axis.title.x = element_text(colour = "black", size = 12, face = "plain"),
+        axis.title.y = element_text(colour = "black", size = 12, face = "plain"),
+        axis.line = element_line(color = "black", size = 0.5)
+    )
+
+print(testshardnum)
+ggsave("testshardnum.pdf", width = 2, height = 2.5)
+
+testEntropys <- ggplot(test, aes(Outcome, Entropy, fill = "white")) +
+    stat_boxplot(geom = "errorbar", width = 0.2, color = "black") +
+    geom_boxplot(size = 0.2, fill = "white", outlier.color = "white", outlier.fill = "white") +
+    geom_jitter(aes(color = Outcome, fill = Outcome), shape = 21, width = 0.25, size = 2) +
+    scale_fill_nejm() +
+    scale_color_nejm() +
+    geom_signif(comparisons = list(c("MP", "IM")), map_signif_level = TRUE, textsize = 2, test = "wilcox.test", step_increase = 0.2) +
+    guides(fill = "none") +
+    labs(x = "", y = "Delta Shannon Index") +
+    theme_bw() +
+    theme(
+        legend.position = "none",
+        axis.ticks = element_line(color = "black", size = 0.2),
+        panel.grid = element_blank(),
+        panel.border = element_rect(color = "white"),
+        axis.text.x = element_text(colour = "black", size = 12),
+        axis.text.y = element_text(colour = "black", size = 12),
+        axis.title.x = element_text(colour = "black", size = 12, face = "plain"),
+        axis.title.y = element_text(colour = "black", size = 12, face = "plain"),
+        axis.line = element_line(color = "black", size = 0.5)
+    )
+
+print(testEntropys)
+ggsave("testEntropys.pdf", width = 2, height = 2.5)
+
+testtrunknumber <- ggplot(test, aes(Outcome, trunk_num, fill = "white")) +
+    stat_boxplot(geom = "errorbar", width = 0.2, color = "black") +
+    geom_boxplot(size = 0.2, fill = "white", outlier.color = "white", outlier.fill = "white") +
+    geom_jitter(aes(color = Outcome, fill = Outcome), shape = 21, width = 0.25, size = 2) +
+    scale_fill_nejm() +
+    scale_color_nejm() +
+    geom_signif(comparisons = list(c("MP", "IM")), map_signif_level = TRUE, textsize = 2, test = "wilcox.test", step_increase = 0.2) +
+    guides(fill = "none") +
+    labs(x = "", y = "Delta Shannon Index") +
+    theme_bw() +
+    theme(
+        legend.position = "none",
+        axis.ticks = element_line(color = "black", size = 0.2),
+        panel.grid = element_blank(),
+        panel.border = element_rect(color = "white"),
+        axis.text.x = element_text(colour = "black", size = 12),
+        axis.text.y = element_text(colour = "black", size = 12),
+        axis.title.x = element_text(colour = "black", size = 12, face = "plain"),
+        axis.title.y = element_text(colour = "black", size = 12, face = "plain"),
+        axis.line = element_line(color = "black", size = 0.5)
+    )
+
+print(testtrunknumber)
+ggsave("testtrunknumber.pdf", width = 2, height = 2.5)
