@@ -1,3 +1,11 @@
+library(ggplot2)
+library(hrbrthemes)
+library(ggsci)
+#install.packages("gg.gap")
+library(gg.gap)
+library(ggplot2)
+library(patchwork)
+library(dplyr)#%>%需要使用
 setwd("/Users/dudua/Documents/ML")
 ML <- read.table("~/ML/机器学习方案图/ML.csv", header = TRUE, sep = ",")#row.names = 1
 View(ML)
