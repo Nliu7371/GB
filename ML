@@ -420,4 +420,54 @@ commonuninum626 <- trainSU %>%
         axis.title.y = element_text())
 print(commonuninum626)
 ggsave("commonuninum626.pdf",width = 6, height = 3)
+commonuninum630 <- testSU %>%
+    mutate(type = factor(type, levels = c("unique","shared")))%>%
+    ggplot(aes(x = reorder (patients, Entropy),y = Number_of_Mutations, fill = type, color = type)) + 
+    geom_bar(stat = "identity", position = "stack",width = 0.78) + 
+    scale_fill_jama()+
+    scale_color_jama()+
+    #guides(fill = guide_legend(reverse = TRUE))+
+    labs (x = "", y = "Number of Mutations")+
+    scale_y_continuous(expand = c(0, 0))+
+    theme_bw()+
+    theme(
+        panel.grid.major.y = element_blank(), 
+        panel.grid.minor.y = element_blank(),
+        panel.grid.major.x = element_blank(), 
+        panel.grid.minor.x = element_blank(),
+        axis.line = element_line(color="black",size=0.5),
+        axis.text.y = element_text(color="black",size=7),
+        axis.ticks = element_line(color = "black", size = 0.2),
+        panel.border = element_blank(),
+        axis.text.x = element_text(colour = "black",angle = 90, vjust = 0, hjust = 1, size=7),
+        axis.title.y = element_text())
+print(commonuninum630)
+ggsave("commonuninum630.pdf",width = 4, height = 3)
 
+
+library(ggsignif)
+tmb <- read.table("~/ML/tmb03.csv", header = TRUE, sep = ",")#row.names = 1
+TMB <- ggplot(tmb, aes(group,TMB,fill = "white")) +#”fill=“设置填充颜色 
+    stat_boxplot(geom = "errorbar", width = 0.2, color = "black")+#由于自带的箱形图没有胡须末端没有短横线，使用误差条的方式补上
+    geom_boxplot(size = 0.2, fill = "white",outlier.color = "white",outlier.fill = "white")+#size设置箱线图的边框线和胡须的线宽度，fill设置填充颜色，outlier.fill和outlier.color设置异常点的属性
+    geom_jitter(aes(color = group),width = 0.25, size = 1.8)+#设置为向水平方向抖动的散点图，width指定了向水平方向抖动，不改变纵轴的值
+    scale_fill_nejm()+
+    scale_color_nejm()+#设置散点图的圆圈的颜色为黑色
+    #scale_shape_manual(values = shapes)+
+    geom_signif(comparisons = list(c("MPLC", "IPM")),map_signif_level=T,textsize=3,test=wilcox.test,step_increase=0.2)+
+    guides(fill="none")+#添加比较
+    #ggtitle("Tumor Mutation Burden")+#设置总的标题
+    labs(x = "", y = "Mutations per Mb")+#设置x轴和y轴的标题
+    theme_bw() +#背景变为白色
+    theme(#plot.title = element_text(family="Helvetica",size=15,face="bold",hjust = 0), #设置总标题的字体属性
+        legend.position = "none",#不需要图例
+        axis.ticks = element_line(color = "black", size = 0.2),
+        panel.grid = element_blank(),#不显示网格线
+        panel.border = element_rect(color = "white"),#边框线为白色
+        axis.text.x = element_text(colour = "black",size=12),#设置x轴刻度标签的字体属性
+        axis.text.y = element_text(colour = "black",size=12),#设置y轴刻度标签的字体属性
+        axis.title.x=element_text(colour = "black",size = 12,face="plain"),#设置x轴的标题的字体属性
+        axis.title.y=element_text(colour = "black",size = 12,face="plain"),#设置y轴的标题的字体属性
+        axis.line = element_line(color="black",size=0.5))#坐标轴黑色宽度0.5
+print(TMB)
+ggsave("TMB.pdf",width = 2, height = 3)
