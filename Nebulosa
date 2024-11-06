@@ -1,0 +1,248 @@
+CART_T <- readRDS("I:/CART_T/CART_T.rds")
+library(ProjecTILs)
+library(Seurat)
+ref <- load.reference.map()
+ref <- load.reference.map()
+markers <- c("Cd4", "Cd8a", "Ccr7", "Tcf7", "Pdcd1", "Havcr2", "Tox", "Izumo1r",
+"Cxcr6", "Xcl1", "Gzmb", "Gzmk", "Ifng", "Foxp3")
+VlnPlot(CART_T, features = markers, stack = T, flip = T, fill.by = "ident", cols = refCols,
+assay = "RNA") + NoLegend()
+refCols <- c("#edbe2a", "#A58AFF", "#53B400", "#F8766D", "#00B6EB", "#d1cfcc", "#FF0000",
+"#87f6a5", "#e812dd")
+DimPlot(CART_T, label = T, cols = refCols)
+refCols <- c("#edbe2a", "#A58AFF", "#53B400", "#F8766D", "#00B6EB", "#d1cfcc", "#FF0000",
+"#87f6a5", "#e812dd")
+markers <- c("Cd4", "Cd8a", "Ccr7", "Tcf7", "Pdcd1", "Havcr2", "Tox", "Izumo1r",
+"Cxcr6", "Xcl1", "Gzmb", "Gzmk", "Ifng", "Foxp3")
+VlnPlot(CART_T, features = markers, stack = T, flip = T, fill.by = "ident", cols = refCols,
+assay = "RNA") + NoLegend()
+querydata <- CART_T
+querydata <- ProjecTILs.classifier(query = querydata, ref = ref)
+View(querydata)
+palette <- c("#edbe2a", "#A58AFF", "#53B400", "#F8766D", "#00B6EB", "#d1cfcc", "#FF0000",
+"#87f6a5", "#e812dd", "#777777")
+names(palette) <- c(levels(ref$functional.cluster), "NA")
+DimPlot(querydata, group.by = "functional.cluster", cols = palette)
+View(querydata)
+querydata@meta.data[["functional.cluster"]]
+setwd("I:/CART_T/plots")
+markers <- c("Cd4", "Cd8a", "Ccr7", "Tcf7", "Pdcd1", "Havcr2", "Tox", "Izumo1r",
+"Cxcr6", "Xcl1", "Gzmb", "Gzmk", "Ifng", "Foxp3")
+VlnPlot(ref, features = markers, stack = T, flip = T, fill.by = "ident", cols = refCols,
+assay = "RNA") + NoLegend()
+VlnPlot(querydata, features = markers, stack = T, flip = T, fill.by = "ident", cols = refCols,
+assay = "RNA") + NoLegend()
+VlnPlot(querydata, features = markers, stack = T, flip = T, fill.by = "functional.cluster", cols = refCols,
+assay = "RNA") + NoLegend()
+unique(querydata$ident)
+# List all available metadata fields in the Seurat object
+print(colnames(querydata@meta.data))
+library(ggplot2)
+df <- FetchData(querydata, vars = c("functional.cluster", "RNA_expression"))  # adjust "RNA_expression" as needed
+ggplot(df, aes(x = functional.cluster, y = RNA_expression, fill = functional.cluster)) +
+geom_violin() +
+scale_fill_manual(values = refCols) +
+theme_minimal() +
+labs(title = "Expression by Functional Cluster") +
+theme(legend.position = "none")
+library(ggplot2)
+df <- FetchData(querydata, vars = c("functional.cluster", "RNA"))  # adjust "RNA_expression" as needed
+ggplot(df, aes(x = functional.cluster, y = RNA_expression, fill = functional.cluster)) +
+geom_violin() +
+scale_fill_manual(values = refCols) +
+theme_minimal() +
+labs(title = "Expression by Functional Cluster") +
+theme(legend.position = "none")
+library(ggplot2)
+df <- FetchData(querydata, vars = c("functional.cluster", "RNA"))  # adjust "RNA_expression" as needed
+ggplot(df, aes(x = functional.cluster, y = RNA, fill = functional.cluster)) +
+geom_violin() +
+scale_fill_manual(values = refCols) +
+theme_minimal() +
+labs(title = "Expression by Functional Cluster") +
+theme(legend.position = "none")
+DimPlot(CART_T, label = T, cols = refCols)
+CART_D5 <- subset(CART_T, orig.ident=='CART_D5')
+CART_D14 <- subset(CART_T, orig.ident=='CART_D14')
+CART_D21 <- subset(CART_T, orig.ident=='CART_D21')
+querydata_D5 <- subset(querydata, orig.ident=='CART_D5')
+querydata_D14 <- subset(querydata, orig.ident=='CART_D14')
+querydata_D21 <- subset(querydata, orig.ident=='CART_D21')
+palette <- c("#edbe2a", "#A58AFF", "#53B400", "#F8766D", "#00B6EB", "#d1cfcc", "#FF0000",
+"#87f6a5", "#e812dd", "#777777")
+names(palette) <- c(levels(ref$functional.cluster), "NA")
+p <- DimPlot(querydata, group.by = "functional.cluster", cols = palette)
+ggsave("querydata projected_umap.pdf",plot=p, width=8,height=5)
+ggsave("querydata projected_umap.pdf",plot=p, width=6,height=4)
+p_D5 <- DimPlot(querydata_D5, group.by = "functional.cluster", cols = palette)
+ggsave("querydata projected_umap.pdf",plot=p_D5, width=6,height=4)
+ggsave("querydata projected_umap.pdf",plot=p, width=6,height=4)
+ggsave("querydata_D5 projected_umap.pdf",plot=p_D5, width=6,height=4)
+p_D14 <- DimPlot(querydata_D14, group.by = "functional.cluster", cols = palette)
+ggsave("querydata_D5 projected_umap.pdf",plot=p_D14, width=6,height=4)
+p_D21 <- DimPlot(querydata_D21, group.by = "functional.cluster", cols = palette)
+ggsave("querydata_D21 projected_umap.pdf",plot=p_D21, width=6,height=4)
+p_D14 <- DimPlot(querydata_D14, group.by = "functional.cluster", cols = palette)
+ggsave("querydata_D14 projected_umap.pdf",plot=p_D14, width=6,height=4)
+p_D21 <- DimPlot(querydata_D21, group.by = "functional.cluster", cols = palette)
+ggsave("querydata_D21 projected_umap.pdf",plot=p_D21, width=6,height=4)
+ggsave("querydata_D5 projected_umap.pdf",plot=p_D5, width=6,height=4)
+library(Seurat)
+library(ggplot2)
+library(cowplot)
+library(tidyverse)
+markers <- c("Cd4", "Cd8a", "Ccr7", "Tcf7", "Pdcd1", "Havcr2", "Tox", "Izumo1r",
+"Cxcr6", "Xcl1", "Gzmb", "Gzmk", "Ifng", "Foxp3")
+VlnPlot(querydata, features = makers,
+stack=T,pt.size=0,
+flip = T,
+add.noise = T)+#横纵轴不标记任何东西
+theme(axis.text.y = element_blank(), #不显示坐标刻度
+axis.ticks.y = element_blank(),
+axis.title = element_blank(),
+axis.text.x = element_text(colour = 'black',size = 10,angle = 90),
+legend.position = 'none')
+VlnPlot(querydata, features = markers,
+stack=T,pt.size=0,
+flip = T,
+add.noise = T)+#横纵轴不标记任何东西
+theme(axis.text.y = element_blank(), #不显示坐标刻度
+axis.ticks.y = element_blank(),
+axis.title = element_blank(),
+axis.text.x = element_text(colour = 'black',size = 10,angle = 90),
+legend.position = 'none')
+VlnPlot(querydata, features = markers,
+stack=T,pt.size=0,
+split.by = 'orig.ident',
+flip = T,
+add.noise = T)+#横纵轴不标记任何东西
+theme(axis.text.y = element_blank(), #不显示坐标刻度
+axis.ticks.y = element_blank(),
+axis.title = element_blank(),
+axis.text.x = element_text(colour = 'black',size = 10,angle = 90),
+legend.position = 'top',
+legend.title=element_blank(),
+legend.box.background = element_blank(),
+legend.text = element_text(color="black",size=10),
+legend.spacing.x=unit(0.2,'cm'),
+legend.key.width=unit(0.4,'cm'),
+legend.key.height=unit(0.4,'cm'),
+legend.background=element_blank())
+# 设置orig.ident为因子，并指定水平的顺序
+CART_T@meta.data[["orig.ident"]] <- factor(CART_T@meta.data[["orig.ident"]],
+levels = c("CART_D5", "CART_D14", "CART_D21"))
+# 设置orig.ident为因子，并指定水平的顺序
+querydata@meta.data[["orig.ident"]] <- factor(querydata@meta.data[["orig.ident"]],
+levels = c("CART_D5", "CART_D14", "CART_D21"))
+VlnPlot(querydata, features = markers,
+stack=T,pt.size=0,
+split.by = 'orig.ident',
+flip = T,
+add.noise = T)+#横纵轴不标记任何东西
+theme(axis.text.y = element_blank(), #不显示坐标刻度
+axis.ticks.y = element_blank(),
+axis.title = element_blank(),
+axis.text.x = element_text(colour = 'black',size = 10,angle = 90),
+legend.position = 'top',
+legend.title=element_blank(),
+legend.box.background = element_blank(),
+legend.text = element_text(color="black",size=10),
+legend.spacing.x=unit(0.2,'cm'),
+legend.key.width=unit(0.4,'cm'),
+legend.key.height=unit(0.4,'cm'),
+legend.background=element_blank())
+VlnPlot(querydata, features = markers,
+stack=T,pt.size=0,
+flip = T,
+add.noise = T,
+split.by = 'orig.ident',
+split.plot = T)+#横纵轴不标记任何东西
+theme(axis.text.y = element_blank(), #不显示坐标刻度
+axis.ticks.y = element_blank(),
+axis.title = element_blank(),
+axis.text.x = element_text(colour = 'black',size = 10,angle = 90),
+legend.position = 'none')
+VlnPlot(querydata, features = markers,
+stack=T,pt.size=0,
+split.by = 'orig.ident',
+flip = T,
+add.noise = T)+#横纵轴不标记任何东西
+theme(axis.text.y = element_blank(), #不显示坐标刻度
+axis.ticks.y = element_blank(),
+axis.title = element_blank(),
+axis.text.x = element_text(colour = 'black',size = 10,angle = 90),
+legend.position = 'top',
+legend.title=element_blank(),
+legend.box.background = element_blank(),
+legend.text = element_text(color="black",size=10),
+legend.spacing.x=unit(0.2,'cm'),
+legend.key.width=unit(0.4,'cm'),
+legend.key.height=unit(0.4,'cm'),
+legend.background=element_blank())
+my36colors <-c('#E5D2DD', '#53A85F', '#F1BB72', '#F3B1A0', '#D6E7A3', '#57C3F3', '#476D87',
+'#E95C59', '#E59CC4', '#AB3282', '#23452F', '#BD956A', '#8C549C', '#585658',
+'#9FA3A8', '#E0D4CA', '#5F3D69', '#C5DEBA', '#58A4C3', '#E4C755', '#F7F398',
+'#AA9A59', '#E63863', '#E39A35', '#C1E6F3', '#6778AE', '#91D0BE', '#B53E2B',
+'#712820', '#DCC1DD', '#CCE0F5',  '#CCC9E6', '#625D9E', '#68A180', '#3A6963',
+'#968175'
+)
+markers <- c("Cd4", "Cd8a", "Ccr7", "Tcf7", "Pdcd1", "Havcr2", "Tox", "Izumo1r",
+"Cxcr6", "Xcl1", "Gzmb", "Gzmk", "Ifng", "Foxp3")
+cart <- CART_T[,markers]
+rlang::last_trace()
+View(querydata)
+querydata@meta.data
+View(querydata@meta.data)
+ident <- querydata@meta.data[["functional.cluster"]]
+VlnPlot(querydata, features = makers,fill.by = ident,
+stack=T,pt.size=0,
+flip = T,
+add.noise = T,
+split.by = 'orig.ident',
+split.plot = T)
+markers <- c("Cd4", "Cd8a", "Ccr7", "Tcf7", "Pdcd1", "Havcr2", "Tox", "Izumo1r",
+"Cxcr6", "Xcl1", "Gzmb", "Gzmk", "Ifng", "Foxp3")
+VlnPlot(querydata, features = makers,fill.by = ident,
+stack=T,pt.size=0,
+flip = T,
+add.noise = T,
+split.by = 'orig.ident',
+split.plot = T)
+VlnPlot(querydata, features = markers,fill.by = ident,
+stack=T,pt.size=0,
+flip = T,
+add.noise = T,
+split.by = 'orig.ident',
+split.plot = T)
+save(querydata, file = "CART_t_querydata.RData")
+library(loupeR)
+create_loupe_from_seurat(querydata, output_name = "loupe_from_seurat_CART_t_querydata")
+create_loupe_from_seurat(querydata, output_name = "loupe_from_seurat_CART_t_querydata")
+load("I:/CART_T/plots/CART_t_querydata.RData")
+View(querydata)
+querydata@meta.data[["functional.cluster"]]
+library(loupeR)
+View(querydata)
+create_loupe_from_seurat(querydata)
+BiocManager::install("ReactomeGSA")
+library(ReactomeGSA)
+library(Seurat)
+library(ggplot2)
+library(clustree)
+library(Nebulosa)
+genes <- c("Myc","Suz12","Suv39h1","Dnmt1","Batf","Eed","Foxo1","Jun")
+pdf(file = "Nebulosa_CART_T.pdf", height = 3, width = 3)
+for (i in 1:length(genes)){
+plot(plot_density(CART_T, features = genes[i],  reduction = "umap") & NoLegend() & NoAxes())
+}
+View(querydata)
+pdf(file = "Nebulosa_CART_T.pdf", height = 3, width = 3)
+for (i in 1:length(genes)){
+plot(plot_density(querydata, features = genes[i],  reduction = "umap") & NoLegend() & NoAxes())
+}
+dev.off()
+pdf(file = "Nebulosa_CART_T.pdf", height = 3, width = 3)
+for (i in 1:length(genes)){
+plot(plot_density(querydata, features = genes[i],  reduction = "umap") & NoLegend() & NoAxes())
+}
+dev.off()
