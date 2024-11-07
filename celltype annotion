@@ -93,13 +93,14 @@ ggsave("C:/Users/dudua/Documents/plots/markers_by_celltype.pdf",plot = p_makers,
 cluster_to_celltype <- c(
   '1' = 'B_cells', '7' = 'B_cells', '22' = 'B_cells',
   '0' = 'T_cells', '2' = 'T_cells', '5' = 'T_cells', '10' = 'T_cells', '12' = 'T_cells', '13' = 'T_cells', '17' = 'T_cells','19' = 'T_cells','20' = 'T_cells',
-  '15' = 'NK',
-  '11' = 'pDCs',
+  '15' = 'NK',nk ilc1
+  '11' = 'pDCs',o
   '16' = 'cDC1s',
-  '18' = 'MigDC',
-  '3' = 'Neutrophils', '8' = 'Neutrophils', '14' = 'Neutrophils',
-  '9' = 'Macrophage', '21' = 'Macrophage', 
-  '4' = 'Monocytes', '6' = 'Monocytes', 
+  '18' = 'MigDC', mi
+  '3' = 'Neutrophils', '8' = 'Neutrophils', '14' = 'Neutrophils', o
+  '9' = 'Macrophage', '21' = 'Macrophage',kc 
+  '4' = 'Monocytes',cdc2
+'6' = 'Monocytes', 
   '23' = 'Basophil',
   '24' = 'Endothelial_cells'
 )
