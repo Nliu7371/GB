@@ -91,16 +91,19 @@ DimPlot(combine, reduction = "tsne", group.by = "orig.ident", label = F, cols = 
 DimPlot(combine, reduction = "umap", group.by = "orig.ident", label = F, cols = sam_colors)
 DimPlot(combine, reduction = "tsne", group.by = "celltype", label = T, cols = cell_colors)
 DimPlot(combine, reduction = "umap", group.by = "celltype", label = T, cols = cell_colors)
+
+
 # celltype proportions calculating
 library(dplyr)
-
-celltype_proportions <- combine@meta.data %>%
+combinecelltype@meta.data$celltype <- factor(combinecelltype@meta.data$celltype, 
+                                     levels = c("B_cells","Neutrophil","NK_ILC1","pDC","cDC1","cDC2","Kupffer","Macrophage","Monocyte", "T_cells" ))
+celltype_proportions <- combinecelltype@meta.data %>%
     group_by(orig.ident, celltype) %>%
     dplyr::summarise(n = dplyr::n(), .groups = "drop") %>%
     group_by(orig.ident) %>%
     mutate(proportion = n / sum(n))
 head(celltype_proportions)
-write.csv(celltype_proportions, "celltype_proportions.csv", row.names = FALSE)
+write.csv(celltype_proportions, "J:/mus_scrna_2024/combine/celltype_proportions.csv", row.names = FALSE)
 celltype_proportions$orig.ident <- factor(celltype_proportions$orig.ident, 
                                           levels = c("CART_D5", "CART_D14", "CART_D21"))
 celltype_proportions <- ggplot(celltype_proportions, aes(x = orig.ident, y = proportion, fill = celltype)) +
@@ -111,7 +114,9 @@ celltype_proportions <- ggplot(celltype_proportions, aes(x = orig.ident, y = pro
   scale_fill_manual(values = cell_colors) # 应用自定义颜色方案
 #保存图像
 ggsave("J:/mus_scrna_2024/Cell Type Proportions in Samples.pdf",plot=celltype_proportions, 
-       width = 3 ,height = 5)
+       width = 4 ,height = 5)
+ggsave("J:/mus_scrna_2024/Cell Type Proportions in Samples.png",plot=celltype_proportions, 
+       width = 4 ,height = 5)
 saveRDS(combine, file = "J:/mus_scrna_2024/combinecelltype.rds")
 #creat loupeR file
 library(loupeR)
