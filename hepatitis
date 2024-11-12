@@ -6,9 +6,6 @@ hepatitis = UpdateSeuratObject (object = hepatitis_combined)
 
 combine <- readRDS("J:/mus_hepatitis/hepatitis.rds")
 
-DimPlot(combine , reduction = "umap", label = T, label.size = 5, pt.size = 0.7)
-DimPlot(combine , reduction = "tsne", label = T, label.size = 5, pt.size = 0.7)
-
 #marker gene expression
 genes <- unique(c("Lyz2", "Itgam", "Itgax","Ccr7", "Clec4f", "Marco", "Adgre1", "Cx3cr1", 
                   "Fcgr1", "Ly6c2", "Spn", "Cd3e", "Cd3d", "Cd4", "Cd8a", "Cd79a", "Ighm", "Jchain", 
@@ -43,10 +40,8 @@ Irf8 #cDCs
 Itgax #cDCs
 
 #0t 1b 2t 3Ma 4Ne 5cDC2 6Ne 7t 8t 9Mono 10b 11t 12pDC 13NK_ILC1 14t 15Mono 16cDC1 17Macro 18t 19t 20Kuffer 21b 22mono 23ne 24NA
-
-p_makers <- DotPlot(combine, features = genes, scale = TRUE, assay = "RNA")+ theme(axis.text.x = element_text(angle = 45,hjust = 1))
-ggsave(plot = p_makers, filename = "markers.pdf",width = 15,height = 10)
-
+#p_makers <- DotPlot(combine, features = genes, scale = TRUE, assay = "RNA")+ theme(axis.text.x = element_text(angle = 45,hjust = 1))
+#ggsave(plot = p_makers, filename = "markers.pdf",width = 15,height = 10)
 
 cluster_to_celltype <- c(
   '1' = 'B_cells', '10' = 'B_cells', '21' = 'B_cells',                    # B细胞群
@@ -62,155 +57,124 @@ cluster_to_celltype <- c(
   '20' = 'Kupffer','24' = 'NA'                                           # 肝巨噬细胞（Kupffer细胞）
 )
 
+#建立细胞类型与cluster映射
 combine@meta.data$celltype <- cluster_to_celltype[as.character(combine@meta.data$seurat_clusters)]
 head(combine@meta.data$celltype)
 colnames(combine@meta.data)
 combine@meta.data$celltype <- factor(combine@meta.data$celltype, 
-                                        levels = c("Kupffer","Neutrophil","Monocyte","Macrophage","pDC","cDC2","cDC1", "NK_ILC1","T_cells", "B_cells"))
-
+                                     levels = c("NA","Kupffer","Neutrophil","Monocyte","Macrophage","pDC","cDC2","cDC1", "NK_ILC1","T_cells", "B_cells"))
 gene <- unique(c( "Cd79a", "Ighm", "Jchain", "Cd3e", "Cd3d", "Cd8a", "Xcl1", "Ncr1", "Klrb1c","Cxcr6", "Ifng","Lyz2", "Itgam", "Itgax", "Siglech","Irf8", "Marco", "Adgre1", "Cx3cr1","Fcgr1", "Ly6c2", "Spn", "S100a9", "Clec4f"  ))
 
-p_all_markers = DotPlot(combine, features = gene, scale = T, assay='RNA', group.by = 'celltype')+ theme(axis.text.x = element_text(angle = 90,hjust = 1))
-p_umap = DimPlot(combine, reduction = "umap", group.by = "celltype", label = TRUE)
-ggsave("J:/mus_scrna_2024/Expression of cell type marker genes.pdf",plot = p_all_markers, width = 20,height = 8)
-
 # 设置orig.ident为因子，并指定水平的顺序
-CART_T@meta.data[["orig.ident"]] <- factor(CART_T@meta.data[["orig.ident"]], 
-                                          levels = c("CART_D5", "CART_D14", "CART_D21"))
-sam_colors <- c("CART_D5"="#f29b76", "CART_D14"="#ffe780","CART_D21"="#5f8fca")
-cell_colors <- c(
-    "B_cells" = "#00468B", # 
-    "Kupffer" = "#42B540", # 
-    "Macrophage" = "#eb8928", #
-    "Monocyte" = "#925E9F", # 
-    "NK_ILC1" = "#FDAF91", # 
-    "Neutrophil" = "#AD002A", # 
-    "T_cells" = "#03a09c", # 
-    "cDC1" = "#c22284", #
-    "cDC2" = "#efdb30", # 
-    "pDC" = "#b3e3f4" # 
+combine@meta.data[["orig.ident"]] <- factor(combine@meta.data[["orig.ident"]], 
+                                           levels = c("UTD_D21", "CART_D5", "CART_D14", "CART_D21"))
+# 设置样本颜色
+sam_colors <- c("UTD_D21"="#CCE0F5","CART_D5"="#DCC1DD", "CART_D14"="#3A6963","CART_D21"="#968175")
+my36colors <-c('#E5D2DD', '#53A85F', '#F1BB72', '#F3B1A0', '#D6E7A3', '#57C3F3', '#476D87',
+'#E95C59', '#E59CC4', '#AB3282', '#23452F', '#BD956A', '#8C549C', '#585658',
+'#9FA3A8', '#E0D4CA', '#5F3D69', '#C5DEBA', '#58A4C3', '#E4C755', '#F7F398',
+'#AA9A59', '#E63863', '#E39A35', '#C1E6F3', '#6778AE', '#91D0BE', '#B53E2B',
+'#712820', '#DCC1DD', '#CCE0F5',  '#CCC9E6', '#625D9E', '#68A180', '#3A6963',
+'#968175'
 )
+
 DimPlot(combine, reduction = "tsne", group.by = "orig.ident", label = F, cols = sam_colors)
 DimPlot(combine, reduction = "umap", group.by = "orig.ident", label = F, cols = sam_colors)
-DimPlot(combine, reduction = "tsne", group.by = "celltype", label = T, cols = cell_colors)
-DimPlot(combine, reduction = "umap", group.by = "celltype", label = T, cols = cell_colors)
-
-
-# celltype proportions calculating
-library(dplyr)
-combinecelltype@meta.data$celltype <- factor(combinecelltype@meta.data$celltype, 
-                                     levels = c("B_cells","Neutrophil","NK_ILC1","pDC","cDC1","cDC2","Kupffer","Macrophage","Monocyte", "T_cells" ))
-celltype_proportions <- combinecelltype@meta.data %>%
-    group_by(orig.ident, celltype) %>%
-    dplyr::summarise(n = dplyr::n(), .groups = "drop") %>%
-    group_by(orig.ident) %>%
-    mutate(proportion = n / sum(n))
-head(celltype_proportions)
-write.csv(celltype_proportions, "J:/mus_scrna_2024/combine/celltype_proportions.csv", row.names = FALSE)
-celltype_proportions$orig.ident <- factor(celltype_proportions$orig.ident, 
-                                          levels = c("CART_D5", "CART_D14", "CART_D21"))
-celltype_proportions <- ggplot(celltype_proportions, aes(x = orig.ident, y = proportion, fill = celltype)) +
-  geom_bar(stat = "identity") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  labs(x = "Sample", y = "Proportion", fill = "Cell Type") +
-  ggtitle("Cell Type Proportions in Samples") +
-  scale_fill_manual(values = cell_colors) # 应用自定义颜色方案
-#保存图像
-ggsave("J:/mus_scrna_2024/Cell Type Proportions in Samples.pdf",plot=celltype_proportions, 
-       width = 4 ,height = 5)
-ggsave("J:/mus_scrna_2024/Cell Type Proportions in Samples.png",plot=celltype_proportions, 
-       width = 4 ,height = 5)
-saveRDS(combine, file = "J:/mus_scrna_2024/combinecelltype.rds")
-#creat loupeR file
-library(loupeR)
-create_loupe_from_seurat(combine, output_name = "loupe_from_seurat_combine")
-
-p<- DimPlot(combinecelltype, reduction = "tsne", label = T)
-ggsave("J:/mus_scrna_2024/combine_cluster_TSNE1.pdf",plot = p, width = 5,height = 4)
-ggsave("J:/mus_scrna_2024/combine_cluster_TSNE1.png",plot = p, width = 5,height = 4)
-p<- DimPlot(combinecelltype, reduction = "umap", label = T)
-ggsave("J:/mus_scrna_2024/combine_cluster_UMAP1.pdf",plot = p, width = 5,height = 4)
-ggsave("J:/mus_scrna_2024/combine_cluster_UMAP1.png",plot = p, width = 5,height = 4)
-
-p<- DimPlot(combinecelltype, reduction = "tsne", group.by = "orig.ident", label = F, cols = sam_colors)
-ggsave("J:/mus_scrna_2024/combine_sample_TSNE1.pdf",plot = p, width = 5,height = 4)
-ggsave("J:/mus_scrna_2024/combine_sample_TSNE1.png",plot = p, width = 5,height = 4)
-p<- DimPlot(combinecelltype, reduction = "umap", group.by = "orig.ident", label = F, cols = sam_colors)
-ggsave("J:/mus_scrna_2024/combine_sample_UMAP1.pdf",plot = p, width = 5,height = 4)
-ggsave("J:/mus_scrna_2024/combine_sample_UMAP1.png",plot = p, width = 5,height = 4)
-
-p<- DimPlot(combinecelltype, reduction = "tsne", group.by = "celltype", label = T, cols = cell_colors)
-ggsave("J:/mus_scrna_2024/combine_cell_TSNE1.pdf",plot = p, width = 5,height = 4)
-ggsave("J:/mus_scrna_2024/combine_cell_TSNE1.png",plot = p, width = 5,height = 4)
-p<- DimPlot(combinecelltype, reduction = "umap", group.by = "celltype", label = T, cols = cell_colors)
-ggsave("J:/mus_scrna_2024/combine_cell_UMAP1.pdf",plot = p, width = 5,height = 4)
-ggsave("J:/mus_scrna_2024/combine_cell_UMAP1.png",plot = p, width = 5,height = 4)
-
-p1<- DimPlot(combinecelltype, reduction = "tsne", label = F)
-ggsave("J:/mus_scrna_2024/combine_cluster_TSNE.pdf",plot = p1, width = 5,height = 4)
-ggsave("J:/mus_scrna_2024/combine_cluster_TSNE.png",plot = p1, width = 5,height = 4)
-p1<- DimPlot(combinecelltype, reduction = "umap", label = F)
-ggsave("J:/mus_scrna_2024/combine_cluster_UMAP.pdf",plot = p1, width = 5,height = 4)
-ggsave("J:/mus_scrna_2024/combine_cluster_UMAP.png",plot = p1, width = 5,height = 4)
-
-p1<- DimPlot(combinecelltype, reduction = "tsne", group.by = "orig.ident", label = T, cols = sam_colors)
-ggsave("J:/mus_scrna_2024/combine_sample_TSNE.pdf",plot = p1, width = 5,height = 4)
-ggsave("J:/mus_scrna_2024/combine_sample_TSNE.png",plot = p1, width = 5,height = 4)
-p1<- DimPlot(combinecelltype, reduction = "umap", group.by = "orig.ident", label = T, cols = sam_colors)
-ggsave("J:/mus_scrna_2024/combine_sample_UMAP.pdf",plot = p1, width = 5,height = 4)
-ggsave("J:/mus_scrna_2024/combine_sample_UMAP.png",plot = p1, width = 5,height = 4)
-
-p1<- DimPlot(combinecelltype, reduction = "tsne", group.by = "celltype", label = F, cols = cell_colors)
-ggsave("J:/mus_scrna_2024/combine_cell_TSNE.pdf",plot = p1, width = 5,height = 4)
-ggsave("J:/mus_scrna_2024/combine_cell_TSNE.png",plot = p1, width = 5,height = 4)
-p1<- DimPlot(combinecelltype, reduction = "umap", group.by = "celltype", label = F, cols = cell_colors)
-ggsave("J:/mus_scrna_2024/combine_cell_UMAP.pdf",plot = p1, width = 5,height = 4)
-ggsave("J:/mus_scrna_2024/combine_cell_UMAP.png",plot = p1, width = 5,height = 4)
+DimPlot(combine, reduction = "tsne", group.by = "celltype", label = T, cols = my36colors)
+DimPlot(combine, reduction = "umap", group.by = "celltype", label = T, cols = my36colors)
 
 # celltype proportions calculating
 library(dplyr)
-
+combine@meta.data$celltype <- factor(combine@meta.data$celltype, 
+                                     levels = c("B_cells","Neutrophil","NK_ILC1","pDC","cDC1","cDC2","Kupffer","Macrophage","Monocyte", "T_cells", "NA" ))
 celltype_proportions <- combine@meta.data %>%
     group_by(orig.ident, celltype) %>%
     dplyr::summarise(n = dplyr::n(), .groups = "drop") %>%
     group_by(orig.ident) %>%
     mutate(proportion = n / sum(n))
 head(celltype_proportions)
-write.csv(celltype_proportions, "celltype_proportions.csv", row.names = FALSE)
+write.csv(celltype_proportions, "J:/mus_hepatitis/celltype_proportions.csv", row.names = FALSE)
 celltype_proportions$orig.ident <- factor(celltype_proportions$orig.ident, 
-                                          levels = c("CART_D5", "CART_D14", "CART_D21"))
+                                          levels = c("UTD_D21", "CART_D5", "CART_D14", "CART_D21"))
 celltype_proportions <- ggplot(celltype_proportions, aes(x = orig.ident, y = proportion, fill = celltype)) +
   geom_bar(stat = "identity") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   labs(x = "Sample", y = "Proportion", fill = "Cell Type") +
   ggtitle("Cell Type Proportions in Samples") +
-  scale_fill_manual(values = cell_colors) # 应用自定义颜色方案
+  scale_fill_manual(values = my36colors) # 应用自定义颜色方案
 #保存图像
-ggsave("J:/mus_scrna_2024/Cell Type Proportions in Samples.pdf",plot=celltype_proportions, 
-       width = 3 ,height = 5)
-saveRDS(combine, file = "J:/mus_scrna_2024/combinecelltype.rds")
+ggsave("J:/mus_hepatitis/Cell Type Proportions in Samples.pdf",plot=celltype_proportions, 
+       width = 4 ,height = 5)
+ggsave("J:/mus_hepatitis/Cell Type Proportions in Samples.png",plot=celltype_proportions, 
+       width = 4 ,height = 5)
+saveRDS(combine, file = "J:/mus_hepatitis/combine.rds")
 #creat loupeR file
 library(loupeR)
-create_loupe_from_seurat(combinecelltype, output_name = "loupe_from_seurat_combine")
+create_loupe_from_seurat(combine, output_name = "loupe_from_seurat_combine")
 
-D5 <- subset(combinecelltype, subset = orig.ident %in% c("CART_D5"))
+p<- DimPlot(combine, reduction = "tsne", group.by = "seurat_clusters", label = T)
+ggsave("J:/mus_hepatitis/combine_cluster_TSNE1.pdf",plot = p, width = 5,height = 4)
+ggsave("J:/mus_hepatitis/combine_cluster_TSNE1.png",plot = p, width = 5,height = 4)
+p<- DimPlot(combine, reduction = "umap", group.by = "seurat_clusters", label = T)
+ggsave("J:/mus_hepatitis/combine_cluster_UMAP1.pdf",plot = p, width = 5,height = 4)
+ggsave("J:/mus_hepatitis/combine_cluster_UMAP1.png",plot = p, width = 5,height = 4)
 
-D14 <- subset(combinecelltype, subset = orig.ident %in% c("CART_D14"))
+p<- DimPlot(combine, reduction = "tsne", group.by = "orig.ident", label = F, cols = sam_colors)
+ggsave("J:/mus_hepatitis/combine_sample_TSNE1.pdf",plot = p, width = 5,height = 4)
+ggsave("J:/mus_hepatitis/combine_sample_TSNE1.png",plot = p, width = 5,height = 4)
+p<- DimPlot(combine, reduction = "umap", group.by = "orig.ident", label = F, cols = sam_colors)
+ggsave("J:/mus_hepatitis/combine_sample_UMAP1.pdf",plot = p, width = 5,height = 4)
+ggsave("J:/mus_hepatitis/combine_sample_UMAP1.png",plot = p, width = 5,height = 4)
 
-D21 <- subset(combinecelltype, subset = orig.ident %in% c("CART_D21"))
+p<- DimPlot(combine, reduction = "tsne", group.by = "celltype", label = T, cols = my36colors)
+ggsave("J:/mus_hepatitis/combine_cell_TSNE1.pdf",plot = p, width = 5,height = 4)
+ggsave("J:/mus_hepatitis/combine_cell_TSNE1.png",plot = p, width = 5,height = 4)
+p<- DimPlot(combine, reduction = "umap", group.by = "celltype", label = T, cols = my36colors)
+ggsave("J:/mus_hepatitis/combine_cell_UMAP1.pdf",plot = p, width = 5,height = 4)
+ggsave("J:/mus_hepatitis/combine_cell_UMAP1.png",plot = p, width = 5,height = 4)
 
-T  <- subset(combinecelltype, subset = celltype %in% c("T_cells"))
+p1<- DimPlot(combine, reduction = "tsne", group.by = "seurat_clusters", label = F)
+ggsave("J:/mus_hepatitis/combine_cluster_TSNE.pdf",plot = p1, width = 5,height = 4)
+ggsave("J:/mus_hepatitis/combine_cluster_TSNE.png",plot = p1, width = 5,height = 4)
+p1<- DimPlot(combine, reduction = "umap", group.by = "seurat_clusters", label = F)
+ggsave("J:/mus_hepatitis/combine_cluster_UMAP.pdf",plot = p1, width = 5,height = 4)
+ggsave("J:/mus_hepatitis/combine_cluster_UMAP.png",plot = p1, width = 5,height = 4)
 
-B <- subset(combinecelltype, subset = celltype %in% c("B_cells"))
+p1<- DimPlot(combine, reduction = "tsne", group.by = "orig.ident", label = T, cols = sam_colors)
+ggsave("J:/mus_hepatitis/combine_sample_TSNE.pdf",plot = p1, width = 5,height = 4)
+ggsave("J:/mus_hepatitis/combine_sample_TSNE.png",plot = p1, width = 5,height = 4)
+p1<- DimPlot(combine, reduction = "umap", group.by = "orig.ident", label = T, cols = sam_colors)
+ggsave("J:/mus_hepatitis/combine_sample_UMAP.pdf",plot = p1, width = 5,height = 4)
+ggsave("J:/mus_hepatitis/combine_sample_UMAP.png",plot = p1, width = 5,height = 4)
 
-Myeloid <- subset(combinecelltype, subset = celltype %in% c("Kupffer","Neutrophil","Monocyte","Macrophage","pDC","cDC2","cDC1"))
+p1<- DimPlot(combine, reduction = "tsne", group.by = "celltype", label = F, cols = my36colors)
+ggsave("J:/mus_hepatitis/combine_cell_TSNE.pdf",plot = p1, width = 5,height = 4)
+ggsave("J:/mus_hepatitis/combine_cell_TSNE.png",plot = p1, width = 5,height = 4)
+p1<- DimPlot(combine, reduction = "umap", group.by = "celltype", label = F, cols = my36colors)
+ggsave("J:/mus_hepatitis/combine_cell_UMAP.pdf",plot = p1, width = 5,height = 4)
+ggsave("J:/mus_hepatitis/combine_cell_UMAP.png",plot = p1, width = 5,height = 4)
 
-NK <- subset(combinecelltype, subset = celltype %in% c("NK_ILC1"))
+UT <- subset(combine, subset = orig.ident %in% c("UTD_D21"))
 
-saveRDS(D5, file = "J:/mus_scrna_2024/D5.rds")
-saveRDS(D14, file = "J:/mus_scrna_2024/D14.rds")
-saveRDS(D21, file = "J:/mus_scrna_2024/D21.rds")
-saveRDS(T, file = "J:/mus_scrna_2024/T.rds")
-saveRDS(B, file = "J:/mus_scrna_2024/B.rds")
-saveRDS(NK, file = "J:/mus_scrna_2024/NK.rds")
-saveRDS(Myeloid, file = "J:/mus_scrna_2024/Myeloid.rds")
+D5 <- subset(combine, subset = orig.ident %in% c("CART_D5"))
+
+D14 <- subset(combine, subset = orig.ident %in% c("CART_D14"))
+
+D21 <- subset(combine, subset = orig.ident %in% c("CART_D21"))
+
+T  <- subset(combine, subset = celltype %in% c("T_cells"))
+
+B <- subset(combine, subset = celltype %in% c("B_cells"))
+
+Myeloid <- subset(combine, subset = celltype %in% c("Kupffer","Neutrophil","Monocyte","Macrophage","pDC","cDC2","cDC1"))
+
+NK <- subset(combine, subset = celltype %in% c("NK_ILC1"))
+
+saveRDS(UT, file = "J:/mus_hepatitis/UT.rds")
+saveRDS(D5, file = "J:/mus_hepatitis/D5.rds")
+saveRDS(D14, file = "J:/mus_hepatitis/D14.rds")
+saveRDS(D21, file = "J:/mus_hepatitis/D21.rds")
+saveRDS(T, file = "J:/mus_hepatitis/T.rds")
+saveRDS(B, file = "J:/mus_hepatitis/B.rds")
+saveRDS(NK, file = "J:/mus_hepatitis/NK.rds")
+saveRDS(Myeloid, file = "J:/mus_hepatitis/Myeloid.rds")
