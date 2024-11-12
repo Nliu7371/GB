@@ -12,28 +12,54 @@ DimPlot(combine , reduction = "tsne", label = T, label.size = 5, pt.size = 0.7)
 #marker gene expression
 genes <- unique(c("Lyz2", "Itgam", "Itgax","Ccr7", "Clec4f", "Marco", "Adgre1", "Cx3cr1", 
                   "Fcgr1", "Ly6c2", "Spn", "Cd3e", "Cd3d", "Cd4", "Cd8a", "Cd79a", "Ighm", "Jchain", 
-                  "S100a9", "Xcl1", "Ncr1", "Klrb1c", "Cxcr6", "Ifng", "Siglech", "Siglecf","Ccr3","Irf8"))
+                  "S100a9", "Xcl1", "Ncr1", "Klrb1c", "Cxcr6", "Ifng", "Siglech", "Irf8"))
 # 绘制DotPlot
 DotPlot(combine, features = genes, scale = TRUE, assay = "RNA")+ theme(axis.text.x = element_text(angle = 45,hjust = 1))
 
-#好看气泡图修饰
+#mouse liver marker genes
+Lyz2 #Myeloid cells
+Itgam #Myeloid cells (Monocyte, Neutrophil, macrophage)
+Itgax #Myeloid cells (Monocyte, DC, macrophage)
+Clec4f #Resident macrophages (Kupffer cells)
+Marco #Resident macrophages
+Adgre1 #Macrophage
+Cx3cr1 #Macrophage, Monocyte
+Fcgr1 #Macrophage, Monocyte
+Ly6c2 #Monocyte
+Spn #Patrolling monocyte
+Cd3e #T cells
+Cd4 #CD4+T cells
+Cd79a #B cells
+Ighm #B cells
+Jchain #B cells
+S100a9 #Neutrophils
+Xcl1 #ILC1s or NKcells
+Ncr1 #ILC1s or NKcells
+Klrb1c #NK or NKT cells
+Cxcr6 #NKT cells
+Ifng #Activating NKT cells
+Siglech #pDCs
+Irf8 #cDCs
+Itgax #cDCs
+
+#0t 1b 2t 3Ma 4Ne 5cDC2 6Ne 7t 8t 9Mono 10b 11t 12pDC 13NK_ILC1 14t 15Mono 16cDC1 17Macro 18t 19t 20Kuffer 21b 22mono 23ne 24NA
 
 p_makers <- DotPlot(combine, features = genes, scale = TRUE, assay = "RNA")+ theme(axis.text.x = element_text(angle = 45,hjust = 1))
 ggsave(plot = p_makers, filename = "markers.pdf",width = 15,height = 10)
 
 
 cluster_to_celltype <- c(
-  '1' = 'B_cells', '7' = 'B_cells', '22' = 'B_cells',                    # B细胞群
-  '0' = 'T_cells', '2' = 'T_cells', '5' = 'T_cells', '10' = 'T_cells', 
-  '12' = 'T_cells', '13' = 'T_cells', '17' = 'T_cells', '19' = 'T_cells', '20' = 'T_cells', # T细胞群
-  '15' = 'NK_ILC1',                                                      # NK/ILC1群
-  '11' = 'pDC',                                                          # 浆细胞样树突状细胞（pDC）
+  '1' = 'B_cells', '10' = 'B_cells', '21' = 'B_cells',                    # B细胞群
+  '0' = 'T_cells', '2' = 'T_cells', '7' = 'T_cells', '8' = 'T_cells', 
+  '11' = 'T_cells', '14' = 'T_cells', '18' = 'T_cells', '19' = 'T_cells', # T细胞群
+  '13' = 'NK_ILC1',                                                      # NK/ILC1群
+  '12' = 'pDC',                                                          # 浆细胞样树突状细胞（pDC）
   '16' = 'cDC1',                                                         # 常规树突状细胞cDC1
-  '4' = 'cDC2',                                                          # 常规树突状细胞cDC2
-  '3' = 'Neutrophil', '8' = 'Neutrophil', '14' = 'Neutrophil',           # 中性粒细胞群
-  '9' = 'Macrophage', '18' = 'Macrophage',                               # 巨噬细胞群
-  '6' = 'Monocyte', '23' = 'Monocyte', '24' = 'Monocyte',                # 单核细胞群
-  '21' = 'Kupffer'                                                       # 肝巨噬细胞（Kupffer细胞）
+  '5' = 'cDC2',                                                          # 常规树突状细胞cDC2
+  '4' = 'Neutrophil', '6' = 'Neutrophil', '23' = 'Neutrophil',           # 中性粒细胞群
+  '3' = 'Macrophage', '17' = 'Macrophage',                               # 巨噬细胞群
+  '9' = 'Monocyte', '15' = 'Monocyte', '22' = 'Monocyte',                # 单核细胞群
+  '20' = 'Kupffer','24' = 'NA'                                           # 肝巨噬细胞（Kupffer细胞）
 )
 
 combine@meta.data$celltype <- cluster_to_celltype[as.character(combine@meta.data$seurat_clusters)]
