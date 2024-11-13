@@ -29,10 +29,13 @@ Cd4 #CD4+T cells
 Cd79a #B cells
 Ighm #B cells
 Jchain #B cells
+S100a8 #Neutrophils
 S100a9 #Neutrophils
+Lcn2 #Neutrophils
 Xcl1 #ILC1s or NKcells
 Ncr1 #ILC1s or NKcells
 Klrb1c #NK or NKT cells
+Klrb1b #NK or NKT cells
 Cxcr6 #NKT cells
 Ifng #Activating NKT cells
 Siglech #pDCs
