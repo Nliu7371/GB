@@ -181,3 +181,30 @@ saveRDS(T, file = "J:/mus_hepatitis/T.rds")
 saveRDS(B, file = "J:/mus_hepatitis/B.rds")
 saveRDS(NK, file = "J:/mus_hepatitis/NK.rds")
 saveRDS(Myeloid, file = "J:/mus_hepatitis/Myeloid.rds")
+
+
+# install.packages("remotes")
+library(MySeuratWrappers)
+remotes::install_github("lyc-1995/MySeuratWrappers")
+p <- VlnPlot(combine, features = gene, 
+        stacked = TRUE, pt.size = 0, 
+        cols = my36colors,             # 设置自定义颜色
+        direction = "horizontal",       # 水平作图
+        x.lab = '', y.lab = '') +       # 不显示横纵轴标签
+    theme(axis.text.x = element_blank(),    # 隐藏x轴文字
+          axis.ticks.x = element_blank()) 
+ggsave("J:/mus_hepatitis/marker_vlnplot.pdf",plot = p, width = 8,height = 7)
+ggsave("J:/mus_hepatitis/marker_vlnplot.png",plot = p, width = 8,height = 7)
+
+combine@meta.data$celltype <- factor(combine@meta.data$celltype, 
+                                     levels = c("B_cells","T_cells", "NK_ILC1","Monocyte","Macrophage","Neutrophil","cDC1", "cDC2","pDC","Kupffer","NA"))
+p<-VlnPlot(combine, features = gene, group.by = "celltype", 
+        stacked = TRUE, pt.size = 0, 
+        cols = my36colors,
+        direction = "horizontal",       
+        x.lab = '', y.lab = '') +       
+    theme(axis.text.x = element_blank(),    
+          axis.ticks.x = element_blank())
+ggsave("J:/mus_hepatitis/marker_cell_vlnplot.pdf",plot = p, width = 8,height = 5)
+ggsave("J:/mus_hepatitis/marker_cell_vlnplot.png",plot = p, width = 8,height = 5)
+
